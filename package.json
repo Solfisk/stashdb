@@ -1,0 +1,25 @@
+{
+  "name": "splitbrain",
+  "version": "0.0.1",
+  "description": "Topic based data repository",
+  "main": "js/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mzedeler/splitbrain.git"
+  },
+  "author": "Michael Zedeler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mzedeler/splitbrain/issues"
+  },
+  "homepage": "https://github.com/mzedeler/splitbrain#readme",
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  },
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
