@@ -1,36 +1,5 @@
 'use strict';
 
-/*
-
-My collection:
-
-/my_collection/
-
-My resource that owns my collection:
-
-/my_collection
-
-Meta collection about my_collection:
-
-/my_collection/!
-
-Collection with subscribers to my_collection:
-
-/my_collection/!/subscribers/
-
-Subscribers to the subscribers collection:
-
-/my_collection/!/subscribers/!/subscribers/
-
-This can be used to carry out two way acknowledging of changes committed.
-
-Subscribers to the meta collection about my_collection:
-
-/my_collection/!/!/subscribers/
-
-*/
-
-
 class Revision {
   constructor(number, key) {
     this.number = number;

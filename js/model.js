@@ -1,42 +1,6 @@
 'use strict';
 
-class Resource {
-  constructor(document, children) {
-    this.document = document;
-    if(children) {
-      this.collection = new Collection(children);
-    }
-  }
-}
-
-class Collection extends Map {
-  constructor(children) {
-    super();
-    this.revison = 0;
-    this.revisions = new WeakMap();
-    if(children) {
-      this.add(children);
-    }
-  }
-
-  set(key, value) {
-    this.revision++;
-    this.revisions[revision] = key;
-    return super.set(key, value);
-  }
-
-  delete(key) {
-    this.revision++;
-    this.revisions[revision] = key;
-    return super.delete(key);
-  }
-}
-
-module.exports = class {
-  constructor(root) {
-    this.root = root || new Resource();
-  }
-};
+let Collection = require('./model/collection.js');
 
 /*
 
@@ -44,4 +8,68 @@ module.exports = class {
   Collection: collection of Resource objects, belonging to a parent Resource
 
 */
+
+/*
+
+My collection:
+
+/my_collection/
+
+My resource that owns my collection:
+
+/my_collection
+
+Meta collection about my_collection:
+
+/my_collection/!
+
+Collection with subscribers to my_collection:
+
+/my_collection/!/subscribers/
+
+Subscribers to the subscribers collection:
+
+/my_collection/!/subscribers/!/subscribers/
+
+This can be used to carry out two way acknowledging of changes committed.
+
+Subscribers to the meta collection about my_collection:
+
+/my_collection/!/!/subscribers/
+
+*/
+
+
+class Model {
+  constructor() {
+    this.root = new Collection();
+  }
+
+  resolve(path) {
+    let names = path.match(/[^\/]+\/?/g);
+    if(path.substr(1, 1) !== '/') {
+      // The path doesn't have a leading slash which is mandatory
+      return;
+    }
+    let coll = this.root;
+    for(let name of names) {
+      let res = coll.get(name);
+      if(name.substr(-1, 1) === '/') {
+        coll = res ? res.collection : null;
+        if(!coll) {
+          return;
+        }
+      } else {
+        return res;
+      }
+    }
+    
+    return coll;
+  }
+}
+
+module.exports = {
+  Model: Model
+};
+
 

@@ -1,14 +1,12 @@
 'use strict';
 
-const express = require('express'),
-      app     = express(),
-      Model   = require('./model.js'),
-      model   = new Model();
+const http  = require('http'),
+      Model = require('./model.js').Model,
+      model = new Model();
 
-for(let path of ['topic']) {
-  var Router = require('./express/' + path + '.js');
-  var router = new Router(model);
-  app.use('/' + path, router);
-}
+http.createServer(function(req, res) {
+  console.log(req.method);
+  res.write('hej');
+  res.end();
+}).listen(8000);
 
-app.listen(3000);
