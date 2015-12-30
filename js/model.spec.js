@@ -34,7 +34,7 @@ describe('Model', () => {
       assert.equal(model.resolve('/'), model.root);
     });
 
-    it('Can resolve resources', () => {
+    it('Can resolve paths', () => {
       // First a fixture:
       model.root.set('a', new Resource());
       model.root.get('a').collection = new Collection();
@@ -67,6 +67,21 @@ describe('Model', () => {
       assert.isUndefined(model.resolve('/a/x/'));
       assert.isUndefined(model.resolve('/x/'));
       assert.isUndefined(model.resolve('/x/y/'));
+    });
+  });
+
+  describe('Traversing paths', () => {
+    it('Can traverse complete paths', () => {
+      assert.equal([...model.traverse('/')][0], model.root);
+      assert.equal([...model.traverse('/')].length, 1);
+      assert.equal([...model.traverse('/a')][1], model.root.get('a'));
+      assert.equal([...model.traverse('/a')].length, 2);
+      assert.equal([...model.traverse('/a/')][2], model.root.get('a').collection);
+      assert.equal([...model.traverse('/a/')].length, 3);
+    });
+    it('Can traverse incomplete paths', () => {
+      assert.equal([...model.traverse('/a/x')][3][0], 'x');
+      assert.equal([...model.traverse('/a/x')].length, 4);
     });
   });
 });

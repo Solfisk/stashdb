@@ -41,6 +41,7 @@ Subscribers to the meta collection about my_collection:
 
 
 class Model {
+
   constructor() {
     this.root = new Collection();
   }
@@ -63,9 +64,44 @@ class Model {
         return coll;
       }
     }
-    
     return res;
   }
+
+  *traverse(path) {
+    let res = {collection: this.root},
+        parts = path.match(/([^\/]+|\/+)/g) || [];
+    if(parts[0] !== '/') {
+      // The path doesn't have a leading slash which is mandatory
+      return;
+    }
+    while(res && parts[0]) {
+      let coll = res.collection,
+          name = parts[1];
+      if(coll) {
+        parts.shift();
+        yield coll;
+      }
+      if(coll && name) {
+        res = coll.get(name);
+        if(res) {
+          parts.shift();
+          yield res;
+        }
+      } else {
+        // Either: coll is undefined because it doesn't exist, so resolve to undefined
+        // Or: name is undefined, so resolve with this collection (if any)
+        if(!coll) {
+          yield parts;
+        }
+        return;
+      }
+      if(!res) {
+        yield [].concat(parts); // Caveat emptor: the result of match can't be passed to yield
+      }
+    }
+    return;
+  }
+
 }
 
 module.exports = {
