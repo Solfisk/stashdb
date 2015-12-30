@@ -46,30 +46,29 @@ class Model {
   }
 
   resolve(path) {
-    let names = path.match(/[^\/]+\/?/g);
-    if(path.substr(1, 1) !== '/') {
+    let res = {collection: this.root},
+        parts = path.match(/([^\/]+|\/+)/g) || [];
+    if(parts[0] !== '/') {
       // The path doesn't have a leading slash which is mandatory
       return;
     }
-    let coll = this.root;
-    for(let name of names) {
-      let res = coll.get(name);
-      if(name.substr(-1, 1) === '/') {
-        coll = res ? res.collection : null;
-        if(!coll) {
-          return;
-        }
+    while(res && parts.shift()) {
+      let coll = res.collection,
+          name = parts.shift();
+      if(coll && name) {
+        res = coll.get(name);
       } else {
-        return res;
+        // Either: coll is undefined because it doesn't exist, so resolve to undefined
+        // Or: name is undefined, so resolve with this collection (if any)
+        return coll;
       }
     }
     
-    return coll;
+    return res;
   }
 }
 
 module.exports = {
   Model: Model
 };
-
 
