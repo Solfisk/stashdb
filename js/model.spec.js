@@ -21,10 +21,7 @@ describe('Model', () => {
       assert.isDefined(model.root);
       assert.instanceOf(model.root, Collection);
       assert.equal(model.root.size, 0);
-  //    console.log('Model 0: ' + model);
-  //    console.log('hej!!!');
     });
-    console.log('Model 1: ' + model);
   });
 
   describe('Resolving paths', () => {
@@ -37,7 +34,7 @@ describe('Model', () => {
     it('Can resolve paths', () => {
       // First a fixture:
       model.root.set('a', new Resource());
-      model.root.get('a').collection = new Collection();
+      model.root.get('a').set('/', new Collection());
       model.root.get('a').id = 'a';
       model.root.set('b', new Resource());
 
@@ -76,9 +73,10 @@ describe('Model', () => {
       assert.equal([...model.traverse('/')].length, 1);
       assert.equal([...model.traverse('/a')][1], model.root.get('a'));
       assert.equal([...model.traverse('/a')].length, 2);
-      assert.equal([...model.traverse('/a/')][2], model.root.get('a').collection);
+      assert.equal([...model.traverse('/a/')][2], model.root.get('a').get('/'));
       assert.equal([...model.traverse('/a/')].length, 3);
     });
+
     it('Can traverse incomplete paths', () => {
       assert.equal([...model.traverse('/a/x')][3][0], 'x');
       assert.equal([...model.traverse('/a/x')].length, 4);

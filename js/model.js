@@ -47,61 +47,47 @@ class Model {
   }
 
   resolve(path) {
-    let res = {collection: this.root},
-        parts = path.match(/([^\/]+|\/+)/g) || [];
-    if(parts[0] !== '/') {
-      // The path doesn't have a leading slash which is mandatory
-      return;
+    let result = [...this.traverse(path)].pop();
+    if(result instanceof Array) {
+      result = undefined;
     }
-    while(res && parts.shift()) {
-      let coll = res.collection,
-          name = parts.shift();
-      if(coll && name) {
-        res = coll.get(name);
-      } else {
-        // Either: coll is undefined because it doesn't exist, so resolve to undefined
-        // Or: name is undefined, so resolve with this collection (if any)
-        return coll;
-      }
-    }
-    return res;
+    return result;
   }
 
   *traverse(path) {
-    let res = {collection: this.root},
+    let node = new Map([['/', this.root]]),
         parts = path.match(/([^\/]+|\/+)/g) || [];
-    if(parts[0] !== '/') {
-      // The path doesn't have a leading slash which is mandatory
-      return;
-    }
-    while(res && parts[0]) {
-      let coll = res.collection,
-          name = parts[1];
-      if(coll) {
-        parts.shift();
-        yield coll;
-      }
-      if(coll && name) {
-        res = coll.get(name);
-        if(res) {
-          parts.shift();
-          yield res;
-        }
-      } else {
-        // Either: coll is undefined because it doesn't exist, so resolve to undefined
-        // Or: name is undefined, so resolve with this collection (if any)
-        if(!coll) {
-          yield parts;
-        }
+
+    while(node && parts.length) {
+      node = node.get(parts[0]);
+      if(!node) {
+        yield [].concat(parts); // Caveat emptor: the result of match can't be passed to yield (probably a bug in node.js);
         return;
+      } else {
+        yield node;
       }
-      if(!res) {
-        yield [].concat(parts); // Caveat emptor: the result of match can't be passed to yield (probably a bug in node.js)
-      }
+      parts.shift();
     }
     return;
   }
 
+/*
+  set(path, value, options) {
+    let lastPart;
+    for(let part of this.traverse(path)) {
+      if(part instanceof Array) {
+        if(lastPart) {
+          if(lastPart.length === 1) {
+            
+          }
+        } else {
+          break;
+        }
+      }
+      lastPart = part;
+    }
+  }
+*/
 }
 
 module.exports = {

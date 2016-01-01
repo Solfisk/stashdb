@@ -1,6 +1,6 @@
 'use strict';
 
-class Resource {
+class Resource extends Map {
 }
 
 module.exports = Resource;
