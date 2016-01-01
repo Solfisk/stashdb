@@ -96,7 +96,7 @@ class Model {
         return;
       }
       if(!res) {
-        yield [].concat(parts); // Caveat emptor: the result of match can't be passed to yield
+        yield [].concat(parts); // Caveat emptor: the result of match can't be passed to yield (probably a bug in node.js)
       }
     }
     return;

@@ -84,5 +84,14 @@ describe('Model', () => {
       assert.equal([...model.traverse('/a/x')].length, 4);
     });
   });
+
+  describe('Setting paths', () => {
+    it('Can set a new resource');
+    it('Can set a new collection');
+    it('Can set an existing resource');
+    it('Can set an existing collection');
+    it('Can set a resource with incomplete path');
+    it('Can set a collection with incomplete path');
+  });
 });
 
