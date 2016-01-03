@@ -69,25 +69,30 @@ describe('Model', () => {
 
   describe('Traversing paths', () => {
     it('Can traverse complete paths', () => {
-      assert.equal([...model.traverse('/')][0], model.root);
+      assert.equal([...model.traverse('/')][0][0], model.root);
       assert.equal([...model.traverse('/')].length, 1);
-      assert.equal([...model.traverse('/a')][1], model.root.get('a'));
+      assert.equal([...model.traverse('/a')][1][0], model.root.get('a'));
       assert.equal([...model.traverse('/a')].length, 2);
-      assert.equal([...model.traverse('/a/')][2], model.root.get('a').get('/'));
+      assert.equal([...model.traverse('/a/')][2][0], model.root.get('a').get('/'));
       assert.equal([...model.traverse('/a/')].length, 3);
     });
 
     it('Can traverse incomplete paths', () => {
-      assert.equal([...model.traverse('/a/x')][3][0], 'x');
+      assert.equal([...model.traverse('/a/x')][3][1], 'x');
       assert.equal([...model.traverse('/a/x')].length, 4);
     });
   });
 
   describe('Setting paths', () => {
-    it('Can set a new resource');
+    it('Can set a new resource', () => {
+      assert.doesNotThrow(() => {
+        model.set('/c', new Resource());
+      });
+    });
     it('Can set a new collection');
     it('Can set an existing resource');
     it('Can set an existing collection');
+    it('Can set root');
     it('Can set a resource with incomplete path');
     it('Can set a collection with incomplete path');
   });

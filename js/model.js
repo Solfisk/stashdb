@@ -47,13 +47,11 @@ class Model {
   }
 
   resolve(path) {
-    let result = [...this.traverse(path)].pop();
-    if(result instanceof Array) {
-      result = undefined;
-    }
-    return result;
+    return [...this.traverse(path)].pop().shift() || undefined;
   }
 
+  // Iterator with arrays containing [node, part] arrays
+  // If traverse reaches an non-existent node, it will start emitting [null, part] arrays
   *traverse(path) {
     let node = new Map([['/', this.root]]),
         parts = path.match(/([^\/]+|\/+)/g) || [];
@@ -61,10 +59,12 @@ class Model {
     while(node && parts.length) {
       node = node.get(parts[0]);
       if(!node) {
-        yield [].concat(parts); // Caveat emptor: the result of match can't be passed to yield (probably a bug in node.js);
+        for(let part of parts) {
+          yield [null, part];
+        }
         return;
       } else {
-        yield node;
+        yield [node, parts[0]];
       }
       parts.shift();
     }
