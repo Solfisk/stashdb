@@ -1,6 +1,6 @@
 'use strict';
 
-let Collection = require('./model/collection.js');
+let Collection = require('./model/node/collection.js');
 
 /*
 
