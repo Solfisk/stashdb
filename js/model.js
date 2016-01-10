@@ -1,6 +1,7 @@
 'use strict';
 
-let Collection = require('./model/node/collection.js');
+let Collection = require('./model/node/collection.js'),
+    Resource = require('./model/node/resource.js');
 
 /*
 
@@ -53,8 +54,8 @@ class Model {
   // Iterator with arrays containing [node, part] arrays
   // If traverse reaches an non-existent node, it will start emitting [null, part] arrays
   *traverse(path) {
-    let node = new Map([['/', this.root]]),
-        parts = path.match(/([^\/]+|\/+)/g) || [];
+    let parts = (path || '').match(/([^\/]+|\/+)/g) || [],
+        node = new Map([['/', this.root]]);
 
     while(node && parts.length) {
       node = node.get(parts[0]);
@@ -71,23 +72,44 @@ class Model {
     return;
   }
 
-/*
-  set(path, value, options) {
-    let lastPart;
-    for(let part of this.traverse(path)) {
-      if(part instanceof Array) {
-        if(lastPart) {
-          if(lastPart.length === 1) {
-            
-          }
-        } else {
-          break;
-        }
+  pointer(path) {
+
+    class LookArray extends Array {
+      exists() {
+        return this.every((part) => { return !!part[0]; });
       }
-      lastPart = part;
+
+      until(cb) {
+        let pass = true;
+        return this.filter((part) => { return pass = pass && cb(part); });
+      }
+
+      from(cb) {
+        let pass = false;
+        return this.filter((part) => { return pass = pass || cb(part); });
+      }
     }
+
+    return LookArray.from([...this.traverse(path)]);
   }
-*/
+
+  get(path) {
+    return (this.pointer(path).pop() || [])[0] || undefined;
+  }
+
+  set(path, value, options) {
+    let pointer = this.pointer(path);
+    let node = pointer.until((part) => { return !!part[0]; }).pop()[0];
+    let missing = pointer.from((part) => { return !part[0];});
+    let lastPart = missing.pop();
+    for(let part of missing) {
+       let next = part[1] === '/' ? new Collection() : new Resource();
+       node.set(part[1], next);
+       node = next;
+    }
+    node.set(lastPart, value);
+  }
+
 }
 
 module.exports = {

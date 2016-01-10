@@ -8,8 +8,6 @@ let assert = require('chai').assert,
     Resource = require('./model/node/resource.js'),
     model;
 
-console.log(Model);
-
 describe('Model', () => {
   describe('Constructor', () => {
     it('Can be called with no arguments', () => {
@@ -81,15 +79,44 @@ describe('Model', () => {
       assert.equal([...model.traverse('/a/x')][3][1], 'x');
       assert.equal([...model.traverse('/a/x')].length, 4);
     });
+
+    it('Can handle invalid paths', () => {
+      assert.ok(model.traverse('').next().done);
+      assert.ok(model.traverse().next().done);
+    });
   });
 
+  describe('Getting paths', () => {
+    it('Can get existing nodes', () => {
+      assert.equal(model.get('/'), model.root);
+      assert.equal(model.get('/a'), model.root.get('a'));
+      assert.equal(model.get('/a/'), model.root.get('a').get('/'));
+    });
+
+    it('Can handle non-existing nodes and invalid path expressions', () => {
+      assert.isUndefined(model.get());
+      assert.isUndefined(model.get(''));
+      assert.isUndefined(model.get('x'));
+      assert.isUndefined(model.get('/q'));
+      assert.isUndefined(model.get('/q/'));
+      assert.isUndefined(model.get('/q/w'));
+    });
+  });
+
+
   describe('Setting paths', () => {
+    let c = new Resource();
     it('Can set a new resource', () => {
       assert.doesNotThrow(() => {
-        model.set('/c', new Resource());
+        model.set('/c', c);
       });
     });
-    it('Can set a new collection');
+    it('Can set a new collection', () => {
+      let cc = new Collection();
+      assert.doesNotThrow(() => {
+        model.set('/c/', cc);
+      });
+    });
     it('Can set an existing resource');
     it('Can set an existing collection');
     it('Can set root');

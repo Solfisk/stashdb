@@ -1,6 +1,7 @@
 'use strict';
 
-let Node = require('../node.js');
+let Node = require('../node.js'),
+    Resource = require('./resource.js');
 
 class Revision {
   constructor(number, key) {
@@ -26,6 +27,9 @@ class Collection extends Node {
   }
 
   set(key, value) {
+    if(!(value instanceof Resource)) {
+      throw 'Value must be instance of Resource';
+    }
     if(this.get(key) !== value) {
       this.addRevision(key);
       super.set(key, value);
