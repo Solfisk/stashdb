@@ -110,15 +110,31 @@ describe('Model', () => {
       assert.doesNotThrow(() => {
         model.set('/c', c);
       });
+      assert.equal(model.get('/c'), c);
     });
     it('Can set a new collection', () => {
       let cc = new Collection();
       assert.doesNotThrow(() => {
         model.set('/c/', cc);
       });
+      assert.equal(model.get('/c/'), cc);
     });
-    it('Can set an existing resource');
-    it('Can set an existing collection');
+    it('Can set an existing resource', () => {
+      let x3 = new Resource();
+      assert.doesNotThrow(() => {
+        model.set('/a/x', x3);
+      });
+      assert.equal(model.get('/a/x'), x3);
+      assert.isUndefined(model.get('/a/x/'));
+    });
+    it('Can set an existing collection', () => {
+      let cc2 = new Collection();
+        model.set('/c/', cc2);
+      assert.doesNotThrow(() => {
+        model.set('/c/', cc2);
+      });
+      assert.equal(model.get('/c/'), cc2);
+    });
     it('Can set root');
     it('Can set a resource with incomplete path');
     it('Can set a collection with incomplete path');
