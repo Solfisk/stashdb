@@ -1,7 +1,7 @@
 'use strict';
 
 let Node = require('../node.js'),
-    Resource = require('./resource.js');
+    ResourceModule = require('./resource.js'); // Indirect import to support cyclic dependencies
 
 class Revision {
   constructor(number, key) {
@@ -27,7 +27,7 @@ class Collection extends Node {
   }
 
   set(key, value) {
-    if(!(value instanceof Resource)) {
+    if(!(value instanceof ResourceModule.Resource)) {
       throw 'Value must be instance of Resource';
     }
     if(this.get(key) !== value) {
@@ -58,5 +58,5 @@ class Collection extends Node {
   }
 }
 
-module.exports = Collection;
+module.exports.Collection = Collection;
 

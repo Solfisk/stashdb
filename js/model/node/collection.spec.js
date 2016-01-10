@@ -3,8 +3,8 @@
 /* global describe, it */
 
 let assert = require('chai').assert,
-    Collection = require('./collection.js'),
-    Resource = require('./resource.js'),
+    Collection = require('./collection.js').Collection,
+    Resource = require('./resource.js').Resource,
     collection;
 
 describe('Constructor', () => {

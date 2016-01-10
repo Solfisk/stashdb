@@ -1,18 +1,20 @@
 'use strict';
 
+// Cyclic: http://stackoverflow.com/questions/10869276/how-to-deal-with-cyclic-dependencies-in-node-js
+
 let Node = require('../node.js'),
-    Collection = require('./collection.js');
+    CollectionModule = require('./collection.js'); // Indirect import to support cyclic dependencies
 
 class Resource extends Node {
   set(key, value) {
-/*    if(!(value instanceof Collection)) {
-      throw 'Value must be instance of Collection';
-    } */
+    if(key === '/' && !(value instanceof CollectionModule.Collection)) {
+      throw new Error('Value must be instance of Collection');
+    }
     return super.set(key, value);
   }
 }
 
-Resource.test = () => { console.log(Collection); };
+Node.Collection = () => { return Collection; };
 
-module.exports = Resource;
+module.exports.Resource = Resource;
 

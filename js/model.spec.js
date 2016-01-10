@@ -4,8 +4,8 @@
 
 let assert = require('chai').assert,
     Model = require('./model.js').Model,
-    Collection = require('./model/node/collection.js'),
-    Resource = require('./model/node/resource.js'),
+    Collection = require('./model/node/collection.js').Collection,
+    Resource = require('./model/node/resource.js').Resource,
     model;
 
 describe('Model', () => {

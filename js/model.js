@@ -1,7 +1,8 @@
 'use strict';
 
-let Collection = require('./model/node/collection.js'),
-    Resource = require('./model/node/resource.js');
+let Node = require('./model/node.js'),
+    Collection = require('./model/node/collection.js').Collection,
+    Resource = require('./model/node/resource.js').Resource;
 
 /*
 
