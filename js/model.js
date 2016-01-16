@@ -4,44 +4,6 @@ let Node = require('./model/node.js'),
     Collection = require('./model/node/collection.js').Collection,
     Resource = require('./model/node/resource.js').Resource;
 
-/*
-
-  Resource: object to be PUT, GET or DELETE'd
-  Collection: collection of Resource objects, belonging to a parent Resource
-
-*/
-
-/*
-
-My collection:
-
-/my_collection/
-
-My resource that owns my collection:
-
-/my_collection
-
-Meta collection about my_collection:
-
-/my_collection/!
-
-Collection with subscribers to my_collection:
-
-/my_collection/!/subscribers/
-
-Subscribers to the subscribers collection:
-
-/my_collection/!/subscribers/!/subscribers/
-
-This can be used to carry out two way acknowledging of changes committed.
-
-Subscribers to the meta collection about my_collection:
-
-/my_collection/!/!/subscribers/
-
-*/
-
-
 class Model {
 
   constructor() {
@@ -125,6 +87,8 @@ class Model {
 }
 
 module.exports = {
-  Model: Model
+  Model: Model,
+  Resource: Resource,
+  Collection: Collection
 };
 

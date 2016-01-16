@@ -18,9 +18,11 @@
   "homepage": "https://github.com/mzedeler/splitbrain#readme",
   "devDependencies": {
     "chai": "^3.4.1",
-    "mocha": "^2.3.4"
+    "mocha": "^2.3.4",
+    "supertest": "^1.1.0"
   },
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "stream-buffers": "^3.0.0"
   }
 }

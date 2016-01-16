@@ -21,6 +21,10 @@ class Node extends Map {
   }
 
   delete(key) {
+    let child = this.get(key);
+    if(child) {
+      child.parent = undefined;
+    }
     this.value2key.delete(this.get(key));
     return super.delete(key);
   }
@@ -31,7 +35,7 @@ class Node extends Map {
   }
 
   keyFor(node) {
-    return this.value2key(node);
+    return this.value2key.get(node);
   }
 
   get name() {
@@ -41,9 +45,13 @@ class Node extends Map {
   }
 
   get path() {
-    if(this.parent && this.name) {
-      return this.parent.path() + this.name;
+    if(this.name) {
+      return (this.parent ? this.parent.path : '') + this.name
     }
+  }
+
+  detach() {
+    this.parent.delete(this.name);
   }
 }
 

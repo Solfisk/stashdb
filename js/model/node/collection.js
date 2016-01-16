@@ -48,6 +48,14 @@ class Collection extends Node {
     }
   }
 
+  get name() {
+    if(!this.parent) {
+      return '/';
+    } else {
+      return super.name;
+    }
+  }
+
   *since(revisionNumber) {
     while(revisionNumber <= this.revisionNumber) {
       let revision = this.revisions.get(revisionNumber++);
