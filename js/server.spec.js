@@ -8,7 +8,7 @@ let assert = require('chai').assert,
 
 describe('Server', () => {
   it('Should have a model', () => {
-    assert.isDefined(app.get('model'));
+    assert.isDefined(app.locals.model);
   });
   it('Should handle GET / upon initialization', (done) => {
     request(app)

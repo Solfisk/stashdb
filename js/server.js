@@ -5,6 +5,7 @@ const express  = require('express'),
       Model = require('./model.js').Model,
       Resource = require('./model.js').Resource,
       Collection = require('./model.js').Collection,
+      CollectionJson = require('./router/collection-json').CollectionJson,
       model = new Model();
 
 // http://martinfowler.com/articles/richardsonMaturityModel.html
@@ -93,9 +94,10 @@ function streamBodyBufferParser(req, res, next) {
 
 function Server() {
   let app = express();
-  app.set('model', model);
+  app.locals.model = model;
+  app.use(CollectionJson());
   app.get(/^.*[^\/]$/, (req, res, next) => {
-    let node = app.get('model').pointer(req.url).pop()[0];
+    let node = app.locals.model.pointer(req.url).pop()[0];
     if(!node) {
       next();
     }
@@ -105,49 +107,15 @@ function Server() {
       res.status(500).end();
     }
   });
-  app.get(/^.*\/$/, (req, res, next) => {
-    let node = app.get('model').pointer(req.url).pop()[0];
-    if(!node) {
-      next();
-    }
-    if(node instanceof Collection) {
-      let result = {};
-      for(let name of node.keys()) {
-        result[name] = node.path + name;
-      }
-      res.json(result).end();
-    } else {
-      res.status(500).end();
-    }
-  });
-  app.put(/^.*\/$/, jsonBodyParser, (req, res, next) => {
-    if(req.headers['content-type'] === 'application/json') {
-      if(typeof req.body === 'object' && !(req.body instanceof Array)) {
-        let collection = new Collection();
-        for(let name in req.body) {
-          let resource = new Resource();
-          resource.contentType = 'application/json; charset=utf-8';
-          resource.content = zlib.gzipSync(new Buffer(JSON.stringify(req.body[name])));
-          collection.set(name, resource);
-        }
-        app.get('model').set(req.path, collection);
-        res.status(204).end();
-      } else {
-        res.status(400).end();
-      }
-    } else {
-      next();
-    }
-  });
   app.put(/^.*[^\/]$/, streamBodyParser, streamBodyBufferParser, (req, res, next) => {
     let resource = new Resource();
     resource.content = req.bodyBuffer;
     resource.contentType = req.headers['content-type'];
-    app.get('model').set(req.path, resource);
+    app.locals.model.set(req.path, resource);
     res.status(204).end();
   });
   app.delete('*', (req, res, next) => {
-    let node = app.get('model').pointer(req.url).pop()[0];
+    let node = app.locals.model.pointer(req.url).pop()[0];
     if(!node) {
       next();
     }
