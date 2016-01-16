@@ -2,25 +2,30 @@
 
 const express  = require('express'),
       zlib = require('zlib'),
+      jsonBodyParser = require('body-parser').json(),
       Resource = require('../model.js').Resource,
-      Collection = require('../model.js').Collection,
-      jsonBodyParser = require('body-parser').json();
+      Collection = require('../model.js').Collection;
 
 function CollectionJson() {
   let router = express.Router();
+
   router.get(/^.*\/$/, (req, res, next) => {
-    let node = req.app.locals.model.pointer(req.url).pop()[0];
-    if(!node) {
-      next();
-    }
-    if(node instanceof Collection) {
-      let result = {};
-      for(let name of node.keys()) {
-        result[name] = node.path + name;
+    if(req.accepts('json')) {
+      let node = req.app.locals.model.pointer(req.url).pop()[0];
+      if(!node) {
+        next();
       }
-      res.json(result).end();
+      if(node instanceof Collection) {
+        let result = {};
+        for(let name of node.keys()) {
+          result[name] = node.path + name;
+        }
+        res.json(result).end();
+      } else {
+        res.status(500).end();
+      }
     } else {
-      res.status(500).end();
+      next();
     }
   });
 

@@ -75,6 +75,18 @@ describe('Server', () => {
       it('Should be able to DELETE resource: ' + path, (done) => { remove(done, path) });
       it('Should not be able to GET: ' + path, (done) => { gone(done, path) });
     }
+
+    it('Should fixture :-)', (done) => {
+      save(done, '/x', 1);
+    });
+
+    it('Should refuse to serve content types that the client does not accept', (done) => {
+      request(app)
+        .get('/x')
+        .set('Accept', 'x-unavailable/nada')
+        .expect(406)
+        .end(done);
+    });
   });
 
   describe('Manipulating collections', () => {
