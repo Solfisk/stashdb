@@ -38,6 +38,7 @@ App((app) => {
       }
 
       for(let path of ['/a/x/', '/x/y/z/']) {
+
         it('Should be able to create collection: ' + path, save(path));
         it('Should be able to GET newly created collection: ' + path, exists(path));
         it('Should have set the resource ' + path + 'c', () => {

@@ -54,7 +54,7 @@ describe('Server', () => {
     function gone(done, path) {
       request(app)
         .get(path)
-        .expect(404, done);
+        .expect(404, () => { done(); });
     }
 
     for(let path of ['/a', '/x/y']) {

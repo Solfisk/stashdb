@@ -50,33 +50,33 @@ function streamBodyBufferParser(req, res, next) {
 function ResourceRaw() {
   let router = express.Router();
 
-  router.get(/^.*[^\/]$/, (req, res, next) => {
-    let node = req.app.locals.model.pointer(req.url).pop()[0];
-    if(!node) {
-      next();
-    }
-    if(node instanceof Resource) {
-      if(node.content) {
-        if(req.accepts(node.contentType)) {
-          res.set('Content-Type', node.contentType).set('Content-Encoding', 'gzip').send(node.content);
+  router.route(/^.*[^\/]$/)
+    .get((req, res, next) => {
+      let node = req.app.locals.model.pointer(req.url).pop()[0];
+      if(!node) {
+        next();
+      }
+      if(node instanceof Resource) {
+        if(node.content) {
+          if(req.accepts(node.contentType)) {
+            res.set('Content-Type', node.contentType).set('Content-Encoding', 'gzip').send(node.content);
+          } else {
+            res.status(406).end();
+          }
         } else {
-          res.status(406).end();
+          res.status(204).end();
         }
       } else {
-        res.status(204).end();
+        res.status(500).end();
       }
-    } else {
-      res.status(500).end();
-    }
-  });
-
-  router.put(/^.*[^\/]$/, streamBodyParser, streamBodyBufferParser, (req, res, next) => {
-    let resource = new Resource();
-    resource.content = req.bodyBuffer;
-    resource.contentType = req.headers['content-type'];
-    req.app.locals.model.set(req.path, resource);
-    res.status(204).end();
-  });
+    })
+    .put(streamBodyParser, streamBodyBufferParser, (req, res, next) => {
+      let resource = new Resource();
+      resource.content = req.bodyBuffer;
+      resource.contentType = req.headers['content-type'];
+      req.app.locals.model.set(req.path, resource);
+      res.status(204).end();
+    });
 
   return router;
 }
