@@ -10,17 +10,7 @@ describe('Server', () => {
   it('Should have a model', () => {
     assert.isDefined(app.locals.model);
   });
-  it('Should handle GET / upon initialization', (done) => {
-    request(app)
-      .get('/')
-      .expect(200)
-      .end(() => { done() });
-/*      .end((err, res) => {
-        console.log(res.headers);
-        console.log(res.text);
-        done();
-      }); */
-  });
+
   it('Should return 404 for non-existing paths', () => {
     request(app)
       .get('/a')
