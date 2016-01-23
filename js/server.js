@@ -7,6 +7,7 @@ const express  = require('express'),
       Collection = require('./model.js').Collection,
       CollectionJson = require('./router/collection-json.js').CollectionJson,
       ResourceRaw = require('./router/resource-raw.js').ResourceRaw,
+      DeleteAny = require('./router/delete-any.js').DeleteAny,
       model = new Model();
 
 // http://martinfowler.com/articles/richardsonMaturityModel.html
@@ -54,15 +55,7 @@ function Server() {
   app.locals.model = model;
   app.use(CollectionJson());
   app.use(ResourceRaw());
-  app.delete('*', (req, res, next) => {
-    let node = app.locals.model.pointer(req.url).pop()[0];
-    if(!node) {
-      next();
-    } else {
-      node.detach();
-      res.status(204).end();
-    }
-  });
+  app.use(DeleteAny());
   app.all('*', (req, res) => {
     res.status(404).end();
   });
