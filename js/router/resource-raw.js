@@ -66,7 +66,10 @@ function ResourceRaw() {
         } else {
           res.status(204).end();
         }
+      } else if(node === null || node === undefined) {
+        res.status(404).end();
       } else {
+        console.warn('Node not instanceof Resource: ' + node);
         res.status(500).end();
       }
     })

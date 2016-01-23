@@ -3,25 +3,24 @@
 
 const assert = require('chai').assert,
       request = require('supertest'),
-      App = require('../fixture/app.fixture.js').App,
+      app = require('../fixture/app.fixture.js').App(),
       ResourceRaw = require('./resource-raw.js').ResourceRaw,
       DeleteAny = require('./delete-any.js').DeleteAny;
 
+app.use(ResourceRaw(), DeleteAny());
 
-App((app) => {
-  app.use(ResourceRaw(), DeleteAny());
+describe('Resources', () => {
 
-  describe('Resources', () => {
-
-    describe('Handling content types', () => {
-      it('Should refuse to serve content types that the client does not accept', (done) => {
-        request(app)
-          .get('/a')
-          .set('Accept', 'x-unavailable/nada')
-          .expect(406, done);
-      });
+  describe('Handling content types', () => {
+    it('Should refuse to serve content types that the client does not accept!', (done) => {
+      request(app)
+        .get('/a')
+        .set('Accept', 'x-unavailable/nada')
+        .expect(406, done);
     });
+  });
 
+  describe('Manipulating resources', () => {
     function save(path, id) {
       return (done) => {
         request(app)
@@ -67,7 +66,7 @@ App((app) => {
       it('Should be able to DELETE resource: ' + path, remove(path));
       it('Should not be able to GET: ' + path, gone(path));
     }
-
   });
+
 });
 

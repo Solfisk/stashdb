@@ -5,7 +5,7 @@ const express = require('express'),
       Resource = require('../model.js').Resource,
       Collection = require('../model.js').Collection;
 
-function App(cb) {
+function App() {
   let model = new Model(),
       app = express();
 
@@ -21,7 +21,7 @@ function App(cb) {
   model.set('/a/b/c/', new Collection());
   app.locals.model = model;
 
-  cb(app);
+  return app;
 }
 
 module.exports.App = App
