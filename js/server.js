@@ -53,12 +53,7 @@ Subscribers to the meta collection about my_collection:
 function Server() {
   let app = express();
   app.locals.model = model;
-  app.use(CollectionJson());
-  app.use(ResourceRaw());
-  app.use(DeleteAny());
-  app.all('*', (req, res) => {
-    res.status(404).end();
-  });
+  app.use(CollectionJson(), ResourceRaw(), DeleteAny());
   return app;
 }
 
