@@ -4,10 +4,12 @@
 const assert = require('chai').assert,
       request = require('supertest'),
       App = require('../fixture/app.fixture.js').App,
-      ResourceRaw = require('./resource-raw.js').ResourceRaw;
+      ResourceRaw = require('./resource-raw.js').ResourceRaw,
+      DeleteAny = require('./delete-any.js').DeleteAny;
+
 
 App((app) => {
-  app.use(ResourceRaw());
+  app.use(ResourceRaw(), DeleteAny());
 
   describe('Resources', () => {
 
@@ -16,72 +18,56 @@ App((app) => {
         request(app)
           .get('/a')
           .set('Accept', 'x-unavailable/nada')
-          .expect(406)
-          .end(done);
+          .expect(406, done);
       });
     });
-/*
 
-    describe('Manipulating collections', () => {
-
-      function save(done, path, id) {
+    function save(path, id) {
+      return (done) => {
         request(app)
           .put(path)
-          .set('Content-Type', 'application/json')
-          .send('{"a": {"b": ' + id + '}}')
+          .set('Content-Type', 'text/plain')
+          .send('content: ' + path + ':' + id)
           .expect(204, done);
-      }
+      };
+    }
 
-      function exists(done, path, id) {
-        request(app)
-          .get(path + 'a')
-          .expect('Content-Type', 'application/json; charset=utf-8')
-          .expect('Content-Encoding', 'gzip')
-          .expect((res) => {
-            assert.deepEqual(res.body, {"b": id});
-          })
-          .expect(200, done);
-      }
-
-      function collectionExists(done, path) {
+    function exists(path, id) {
+      return (done) => {
         request(app)
           .get(path)
-          .expect('Content-Type', 'application/json; charset=utf-8')
-   //       .expect('Content-Encoding', 'gzip')
-          .expect((res) => {
-            assert.deepEqual(res.body, {"a": path + 'a'});
-          })
+          .expect('Content-Type', 'text/plain; charset=utf-8')
+          .expect('Content-Encoding', 'gzip')
+          .expect('content: ' + path + ':' + id)
           .expect(200, done);
-      }
+      };
+    }
 
-      function remove(done, path) {
+    function remove(path) {
+      return (done) => {
         request(app)
           .delete(path)
           .expect(204, done);
-      }
+      };
+    }
 
-      function gone(done, path) {
+    function gone(path) {
+      return (done) => {
         request(app)
           .get(path)
           .expect(404, done);
-      }
-      for(let path of ['/a/', '/x/y/z/']) {
-        it('Should be able to create collection: ' + path, (done) => { save(done, path, 1) });
-        it('Should be able to GET newly created collection: ' + path, (done) => { collectionExists(done, path) });
-        it('Should be able to GET a member of the newly created collection: ' + path, (done) => { exists(done, path, 1) });
-        it('Should be able to replace collection: ' + path, (done) => { save(done, path, 2) });
-        it('Should be able to GET replaced collection: ' + path, (done) => { exists(done, path, 2) });
-        it('Should be able to DELETE collection: ' + path, (done) => { remove(done, path) });
-        it('Should not be able to GET: ' + path, (done) => { gone(done, path) });
+      };
+    }
 
-      }
-    });
+    for(let path of ['/a', '/x/y']) {
+      it('Should be able to create resource: ' + path, save(path, 1));
+      it('Should be able to GET newly created resource: ' + path, exists(path, 1));
+      it('Should be able to replace resource: ' + path, save(path, 2));
+      it('Should be able to GET replaced resource: ' + path, exists(path, 2));
+      it('Should be able to DELETE resource: ' + path, remove(path));
+      it('Should not be able to GET: ' + path, gone(path));
+    }
 
-    it('Should be able to return collections and resources', () => {
-      let model = app.get('model');
-
-    });
-  */
   });
 });
 
