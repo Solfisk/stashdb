@@ -5,19 +5,83 @@ const assert = require('chai').assert,
       request = require('supertest'),
       app = require('../fixture/app.fixture.js').App(),
       ResourceRaw = require('./resource-raw.js').ResourceRaw,
-      DeleteAny = require('./delete-any.js').DeleteAny;
+      DeleteAny = require('./delete-any.js').DeleteAny,
+      series = require('async').series;
 
 app.use(ResourceRaw(), DeleteAny());
+
 
 describe('Resources', () => {
 
   describe('Handling content types', () => {
-    it('Should refuse to serve content types that the client does not accept!', (done) => {
-      request(app)
-        .get('/a')
-        .set('Accept', 'x-unavailable/nada')
-        .expect(406, done);
+    describe('Invalid accept headers', () => {
+      for(let headers of [
+          {'Accept': 'image/jpeg'},
+          {'Accept': 'text/plain',
+           'Accept-Charset': 'nonexistent'}
+        ]) {
+        it('Should return 406 on Accept ' + headers.Accept + ' and Accept-Charset ' + (headers['Accept-Charset'] || 'unset'), (done) => {
+            request(app)
+              .get('/a')
+              .set(headers)
+              .expect(406, done);
+        });
+      }
     });
+
+    describe('Valid accept headers', () => {
+      for(let headers of [
+          {'Accept': 'text/plain'},
+          {'Accept': 'text/plain',
+           'Accept-Charset': 'utf-8'},
+          {'Accept': 'text/plain',
+           'Accept-Charset': '*'},
+          {'Accept': '*/*',
+           'Accept-Charset': 'utf-8'},
+          {'Accept': '*/*'}
+        ]) {
+        it('Should return 200 on Accept ' + headers.Accept + ' and Accept-Charset ' + (headers['Accept-Charset'] || 'unset'), (done) => {
+            request(app)
+              .get('/a')
+              .set(headers)
+              .expect(200, done);
+        });
+      }
+    });
+
+    describe('Parsing charset from Content-Type header', () => {
+      for(let test of [
+          [{'Content-Type': 'application/json'}, 'utf-8', 'application/json; charset=utf-8'],
+          [{'Content-Type': 'application/json; charset=utf-8'}, 'utf-8', 'application/json; charset=utf-8'],
+          [{'Content-Type': 'text/plain'}, 'utf-8', 'text/plain; charset=utf-8'],
+          [{'Content-Type': 'text/html'}, 'utf-8', 'text/html; charset=utf-8'],
+          [{'Content-Type': 'text/plain; charset=utf-8'}, 'utf-8', 'text/plain; charset=utf-8'],
+          [{'Content-Type': 'text/plain; charset=latin1'}, 'latin1', 'text/plain; charset=latin1'],
+          [{'Content-Type': 'image/jpg'}, undefined, 'image/jpg']
+        ]) {
+          describe('Sending ' + test[0]['Content-Type'], () => {
+            it('Should be able to receive Content-Type ' + test[0]['Content-Type'], (done) => {
+              request(app)
+                .put('/charset')
+                .set(test[0])
+                .send('[]') // Superagent will try parsing any json sent, so it has to be JSON content for this test to work
+                .expect(204, done);
+            });
+            it('Should be able to serve the newly saved resource', (done) => {
+              request(app)
+                .get('/charset')
+                .expect(200, done);
+            });
+            it('Should have the right charset on the newly saved resource with', (done) => {
+              request(app)
+                .get('/charset')
+                .expect('Content-Type', test[2])
+                .expect(200, done);
+            });
+          });
+      }
+    });
+
   });
 
   describe('Manipulating resources', () => {

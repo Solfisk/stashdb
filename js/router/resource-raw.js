@@ -58,8 +58,8 @@ function ResourceRaw() {
       }
       if(node instanceof Resource) {
         if(node.content) {
-          if(req.accepts(node.contentType)) {
-            res.set('Content-Type', node.contentType).set('Content-Encoding', 'gzip').send(node.content);
+          if(req.accepts(node.contentType) && req.acceptsCharsets(node.charset) && req.acceptsEncodings('gzip')) {
+            res.set({'Content-Type': node.contentType + (node.charset ? '; charset=' + node.charset : ''), 'Content-Encoding': 'gzip'}).send(node.content);
           } else {
             res.status(406).end();
           }
@@ -76,7 +76,16 @@ function ResourceRaw() {
     .put(streamBodyParser, streamBodyBufferParser, (req, res, next) => {
       let resource = new Resource();
       resource.content = req.bodyBuffer;
-      resource.contentType = req.headers['content-type'];
+      let match = req.headers['content-type'].match(/([^ ;]+)(?:; *charset=(.+))?/i);
+      resource.contentType = match[1];
+      if(match[2]) {
+        resource.charset = match[2];
+      } else {
+        // JSON and text defaults to utf-8
+        if(req.is('json') || req.is('text/*')) {
+          resource.charset = 'utf-8';
+        }
+      }
       req.app.locals.model.set(req.path, resource);
       res.status(204).end();
     });
