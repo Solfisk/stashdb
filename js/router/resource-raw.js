@@ -4,48 +4,8 @@ const express = require('express'),
       zlib = require('zlib'),
       streamBuffers = require('stream-buffers'),
       Resource = require('../model.js').Resource,
-      Collection = require('../model.js').Collection;
-
-function streamBodyParser(req, res, next) {
-  let encoding = (req.headers['content-encoding'] || 'identity').toLowerCase(),
-      length = req.headers['content-length'],
-      stream;
-
-  switch (encoding) {
-    case 'deflate':
-      stream = zlib.createGzip();
-      req.pipe(zlib.createInflate()).pipe(stream);
-      break
-    case 'gzip':
-    case 'x-gzip':
-      stream = req;
-      stream.length = length;
-      break
-    case 'identity':
-      stream = zlib.createGzip();
-      req.pipe(stream);
-      break
-    default:
-      res.status(415).end('Unsupported content encoding "' + encoding + '"');
-  }
-
-  req.bodyStream = stream;
-
-  next();
-}
-
-function streamBodyBufferParser(req, res, next) {
-  let writable = new streamBuffers.WritableStreamBuffer({initialSize: 100});
-  writable.on('finish', () => {
-    req.bodyBuffer = writable.getContents();
-    next();
-  });
-  writable.on('error', () => {
-    res.status(500).end();
-  });
-
-  req.bodyStream.pipe(writable);
-}
+      Collection = require('../model.js').Collection,
+      streamBodyBufferParser = require('./stream-body-buffer-parser.js').streamBodyBufferParser;
 
 function ResourceRaw() {
   let router = express.Router();
@@ -73,7 +33,7 @@ function ResourceRaw() {
         res.status(500).end();
       }
     })
-    .put(streamBodyParser, streamBodyBufferParser, (req, res, next) => {
+    .put(streamBodyBufferParser, (req, res, next) => {
       let resource = new Resource();
       resource.content = req.bodyBuffer;
       let match = req.headers['content-type'].match(/([^ ;]+)(?:; *charset=(.+))?/i);
