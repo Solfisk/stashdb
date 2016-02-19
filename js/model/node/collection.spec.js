@@ -23,9 +23,9 @@ describe('Basic methods', () => {
       x2 = new Resource();
 
   it('Always returns empty iterator when calling since on empty collection', () => {
-    assert.deepEqual([...collection.since(0)], []);
-    assert.deepEqual([...collection.since(-1)], []);
-    assert.deepEqual([...collection.since(1)], []);
+    assert.deepEqual([...collection.between(0)], []);
+    assert.deepEqual([...collection.between(-1)], []);
+    assert.deepEqual([...collection.between(1)], []);
   });
   it('Can set a => x', () => {
     collection.set('a', x);
@@ -39,23 +39,27 @@ describe('Basic methods', () => {
   });
   it('Has correct revision entries', () => {
     assert.equal(collection.revisionNumber, 2);
-    assert.deepEqual([...collection.since(0)], [['a', x], ['b', y]]);
-    assert.deepEqual([...collection.since(3)], []);
+    assert.deepEqual([...collection.between(0)], [['a', x], ['b', y]]);
+    assert.deepEqual([...collection.between(3)], []);
   });
   it('Supports delete', () => {
     collection.delete('a');
     assert.deepEqual([...collection], [['b', y]], 'Collection contains b => y');
-    assert.deepEqual([...collection.since(0)], [['b', y], ['a', undefined]], 'History contains tombstone for a');
+    assert.deepEqual([...collection.between(0)], [['b', y], ['a', undefined]], 'History contains tombstone for a');
   });
   it('Supports reinsertion of elements', () => {
     collection.set('a', x2);
     assert.deepEqual([...collection], [['b', y], ['a', x2]], 'Collection contains b => y and a => x2');
-    assert.deepEqual([...collection.since(0)], [['b', y], ['a', x2]], 'History contains b => y and a => x2');
+    assert.deepEqual([...collection.between(0)], [['b', y], ['a', x2]], 'History contains b => y and a => x2');
+  });
+  it('Has working between method', () => {
+    assert.deepEqual([...collection.between(0, 0)], [], 'History from 0 to 0 is empty');
+    assert.deepEqual([...collection.between(0, 1)], [], 'History from 0 to 1 is empty');
   });
   it('Supports clear()', () => {
     collection.clear();
     assert.deepEqual([...collection], [], 'Collection is empty');
-    assert.deepEqual([...collection.since(0)], [['b', undefined], ['a', undefined]], 'History contains tombstones for a and b');
+    assert.deepEqual([...collection.between(0)], [['b', undefined], ['a', undefined]], 'History contains tombstones for a and b');
   });
 });
 

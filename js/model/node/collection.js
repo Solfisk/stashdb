@@ -56,18 +56,10 @@ class Collection extends Node {
     }
   }
 
-  *since(revisionNumber) {
-    while(revisionNumber <= this.revisionNumber) {
-      let revision = this.revisions.get(revisionNumber++);
-      if(revision) {
-        yield [revision.key, this.get(revision.key)];
-      }
-    }
-  }
-
   *between(fromRevision, toRevision) {
-    let revisionNumber = fromRevision || 0;
-    let maxRevision = (toRevision || Infinity) < this.revisionNumber ? toRevision : this.revisionNumber;
+    toRevision = typeof toRevision === 'undefined' ? Infinity : toRevision;
+    let revisionNumber = fromRevision || 0,
+        maxRevision = toRevision < this.revisionNumber ? toRevision : this.revisionNumber;
     while(revisionNumber <= maxRevision) {
       let revision = this.revisions.get(revisionNumber++);
       if(revision) {
