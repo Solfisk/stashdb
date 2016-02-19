@@ -66,18 +66,31 @@ describe('Collection using Json', () => {
       });
       it('Should return revisions since a given revision', (done) => {
         request(app)
-          .get('/collection-history/?sinceRevision=3')
+          .get('/collection-history/?fromRevision=3')
           .expect({b: "/collection-history/b"})
           .expect(200, done);
       });
-      it('Should return no revisions if sinceRevision is invalid', (done) => {
+      it('Should return no revisions if fromRevision is invalid', (done) => {
         request(app)
-          .get('/collection-history/?sinceRevision=a')
+          .get('/collection-history/?fromRevision=a')
           .expect({})
           .expect(200, done);
       });
     });
+  });
 
+  describe('Paging', () => {
+    it('Should respect the pageSize parameter', (done) => {
+      app.locals.model.fixture.newCollection('/paging/');
+      for(let i=1; i<10; i++) {
+        app.locals.model.fixture.setPlain('/paging/' + i, i);
+      }
+      request(app)
+        .get('/paging/?pageSize=2')
+        .expect({1: "/paging/1", 2: "/paging/2"})
+        .expect(200, done);
+    });
+    it('Should be possible to page through the collection');
   });
 });
 

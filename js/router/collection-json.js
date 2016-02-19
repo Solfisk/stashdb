@@ -19,10 +19,21 @@ function CollectionJson() {
           return;
         }
         if(node instanceof Collection) {
-          let result = {};
-          let sinceRevision = req.query.sinceRevision || 0;
-          for(let revisionPair of node.since(sinceRevision)) {
-            result[revisionPair[0]] = node.path + revisionPair[0];
+          const pageSize = req.query.pageSize || Infinity,
+                page = req.query.page || 1,
+                fromRevision = req.query.fromRevision || 0;
+          let result = {},
+              i = 0;
+          for(let revisionPair of node.since(fromRevision)) {
+            i++;
+            if(i > (pageSize * page || 0)) {
+              break;
+            } else if(i > (pageSize * (page - 1) || 0)) {
+              result[revisionPair[0]] = node.path + revisionPair[0];
+            }
+          }
+          if(pageSize < Infinity) {
+            res.header('Link', '<' + node.path + '?page=' + (page + 1) + '&pageSize=' + pageSize + '&fromRevision=' + fromRevision + '>; rel=next');
           }
           res.header('Collection-Revision', node.revisionNumber).json(result).end();
         } else {
