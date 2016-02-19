@@ -20,9 +20,22 @@ function App() {
     return resource;
   }
 
-  model.set('/a', resource('text/plain', 'utf-8', zlib.gzipSync('content: a')));
-  model.set('/a/b', resource('application/json', 'utf-8', zlib.gzipSync(JSON.stringify({"w": [1, 2, null, "q"]}))));
-  model.set('/a/b/c/', new Collection());
+  model.fixture = {
+    setPlain: (key, value) => {
+      model.set(key, resource('text/plain', 'utf-8', zlib.gzipSync('content: ' + value)));
+    },
+    setJson: (key, value) => {
+      model.set(key, resource('application/json', 'utf-8', zlib.gzipSync(JSON.stringify(value))));
+    },
+    newCollection: (key) => {
+      model.set(key, new Collection());
+    }
+  };
+
+  model.fixture.setPlain('/a', 'content: a');
+  model.fixture.setJson('/a/b', {"w": [1, 2, null, "q"]});
+  model.fixture.newCollection('/a/b/c/');
+
   app.locals.model = model;
 
   return app;

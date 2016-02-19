@@ -46,6 +46,38 @@ describe('Collection using Json', () => {
         assert.instanceOf(app.locals.model.get(path + 'c'), Resource);
       });
     }
+
+    describe('Working with collection history', () => {
+      it('Should have a revision header', (done) => {
+        request(app)
+          .get('/')
+          .expect('Collection-Revision', /^\d+$/)
+          .expect(200, done);
+      });
+      it('Should increase revision numbers when PUTting new resources', (done) => {
+        app.locals.model.fixture.newCollection('/collection-history/');
+        app.locals.model.fixture.setPlain('/collection-history/a', 'a');
+        app.locals.model.fixture.setPlain('/collection-history/b', 'b1');
+        app.locals.model.fixture.setPlain('/collection-history/b', 'b2');
+        request(app)
+          .get('/collection-history/')
+          .expect('Collection-Revision', 3)
+          .expect(200, done);
+      });
+      it('Should return revisions since a given revision', (done) => {
+        request(app)
+          .get('/collection-history/?sinceRevision=3')
+          .expect({b: "/collection-history/b"})
+          .expect(200, done);
+      });
+      it('Should return no revisions if sinceRevision is invalid', (done) => {
+        request(app)
+          .get('/collection-history/?sinceRevision=a')
+          .expect({})
+          .expect(200, done);
+      });
+    });
+
   });
 });
 

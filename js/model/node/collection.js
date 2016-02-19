@@ -19,7 +19,7 @@ class Collection extends Node {
   }
 
   addRevision(key) {
-    let revisionNumber = this.revisionNumber++;
+    let revisionNumber = ++this.revisionNumber;
     this.revisions.delete(this.key2revision.get(key));
     this.key2revision.set(key, revisionNumber);
     this.revisions.delete(revisionNumber);

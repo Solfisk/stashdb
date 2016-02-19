@@ -9,21 +9,22 @@ const express  = require('express'),
 function CollectionJson() {
   let router = express.Router();
 
-  router.route(/^.*\/$/)
+  router.route(/^.*\/(\?.*)*$/)
    .get((req, res, next) => {
       if(req.accepts('json')) {
-        let node = req.app.locals.model.pointer(req.url).pop()[0];
+        let node = req.app.locals.model.pointer(req.path).pop()[0];
         if(!node) {
-          console.log(req.url + ' not found - next()');
+          console.log(req.path + ' not found - next()');
           next();
           return;
         }
         if(node instanceof Collection) {
           let result = {};
-          for(let name of node.keys()) {
-            result[name] = node.path + name;
+          let sinceRevision = req.query.sinceRevision || 0;
+          for(let revisionPair of node.since(sinceRevision)) {
+            result[revisionPair[0]] = node.path + revisionPair[0];
           }
-          res.json(result).end();
+          res.header('Collection-Revision', node.revisionNumber).json(result).end();
         } else {
           res.status(500).end();
         }
