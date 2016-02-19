@@ -10,6 +10,8 @@ const express  = require('express'),
       DeleteAny = require('./router/delete-any.js').DeleteAny,
       model = new Model();
 
+// This route organization: http://codetunnel.io/an-intuitive-way-to-organize-your-expressjs-routes/
+
 // http://martinfowler.com/articles/richardsonMaturityModel.html
 
 /*
@@ -54,6 +56,9 @@ function Server() {
   let app = express();
   app.locals.model = model;
   app.use(CollectionJson(), ResourceRaw(), DeleteAny());
+  app.get('*', function(req, res, next) {
+    res.status(404).set('Content-Type', 'text/plain').send('Not found').end();
+  });
   return app;
 }
 

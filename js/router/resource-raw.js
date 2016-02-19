@@ -14,7 +14,9 @@ function ResourceRaw() {
     .get((req, res, next) => {
       let node = req.app.locals.model.pointer(req.url).pop()[0];
       if(!node) {
+        console.log('ResourceRaw: ' + req.url + ' not found - next()');
         next();
+        return;
       }
       if(node instanceof Resource) {
         if(node.content) {
@@ -36,18 +38,22 @@ function ResourceRaw() {
     .put(streamBodyBufferParser, (req, res, next) => {
       let resource = new Resource();
       resource.content = req.bodyBuffer;
-      let match = req.headers['content-type'].match(/([^ ;]+)(?:; *charset=(.+))?/i);
-      resource.contentType = match[1];
-      if(match[2]) {
-        resource.charset = match[2];
+      if(typeof req.headers['content-type'] === 'undefined') {
+        res.status(400).set('Content-Type', 'text/plain').send('Missing Content-Type').end();
       } else {
-        // JSON and text defaults to utf-8
-        if(req.is('json') || req.is('text/*')) {
-          resource.charset = 'utf-8';
+        let match = req.headers['content-type'].match(/([^ ;]+)(?:; *charset=(.+))?/i);
+        resource.contentType = match[1];
+        if(match[2]) {
+          resource.charset = match[2];
+        } else {
+          // JSON and text defaults to utf-8
+          if(req.is('json') || req.is('text/*')) {
+            resource.charset = 'utf-8';
+	  }
         }
+        req.app.locals.model.set(req.path, resource);
+        res.status(204).end();
       }
-      req.app.locals.model.set(req.path, resource);
-      res.status(204).end();
     });
 
   return router;

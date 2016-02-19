@@ -11,18 +11,12 @@ describe('Server', () => {
     assert.isDefined(app.locals.model);
   });
 
-  it('Should return 404 for non-existing paths', () => {
-    request(app)
-      .get('/a')
-      .expect(404);
-
-    request(app)
-      .get('/a/')
-      .expect(404);
-
-    request(app)
-      .get('//')
-      .expect(404);
-  });
+  for(let path of ['/a', '/a/', '//']) {
+    it('Should return 404 for non-existing path: ' + path, (done) => {
+      request(app)
+        .get(path)
+        .expect(404, done);
+    });
+  }
 });
 

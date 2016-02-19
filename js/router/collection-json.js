@@ -14,7 +14,9 @@ function CollectionJson() {
       if(req.accepts('json')) {
         let node = req.app.locals.model.pointer(req.url).pop()[0];
         if(!node) {
+          console.log(req.url + ' not found - next()');
           next();
+          return;
         }
         if(node instanceof Collection) {
           let result = {};
@@ -26,7 +28,9 @@ function CollectionJson() {
           res.status(500).end();
         }
       } else {
+        console.log('CollectionJson - request doesnt accept json - next()');
         next();
+        return;
       }
     })
     .put(jsonBodyParser, (req, res, next) => {
@@ -46,6 +50,7 @@ function CollectionJson() {
         }
       } else {
         next();
+        return;
     }
   });
 

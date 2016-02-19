@@ -14,6 +14,7 @@ app.use(ResourceRaw(), DeleteAny());
 describe('Resources', () => {
 
   describe('Handling content types', () => {
+
     describe('Invalid accept headers', () => {
       for(let headers of [
           {'Accept': 'image/jpeg'},
