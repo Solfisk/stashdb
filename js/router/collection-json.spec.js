@@ -76,21 +76,38 @@ describe('Collection using Json', () => {
           .expect({})
           .expect(200, done);
       });
+      it('Should return revisions up to given revision', (done) => {
+        request(app)
+          .get('/collection-history/?toRevision=1')
+          .expect({a: "/collection-history/a"})
+          .expect(200, done);
+      });
     });
   });
 
   describe('Paging', () => {
     it('Should respect the pageSize parameter', (done) => {
       app.locals.model.fixture.newCollection('/paging/');
-      for(let i=1; i<10; i++) {
+      for(let i=1; i<4; i++) {
         app.locals.model.fixture.setPlain('/paging/' + i, i);
       }
       request(app)
         .get('/paging/?pageSize=2')
         .expect({1: "/paging/1", 2: "/paging/2"})
+        .expect('Link', /<\/paging\/[^>]+>;\s+rel=next/)
         .expect(200, done);
     });
-    it('Should be possible to page through the collection');
+    it('Should be possible to page through the collection', (done) => {
+      request(app)
+        .get('/paging/?pageSize=2')
+        .end((err, res) => {
+          var matches = res.headers['link'].match(/<([^>]+)/);
+          request(app)
+            .get(matches[1])
+            .expect({3: "/paging/3"})
+            .expect(200, done);
+        });
+    });
   });
 });
 

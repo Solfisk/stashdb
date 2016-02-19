@@ -64,6 +64,17 @@ class Collection extends Node {
       }
     }
   }
+
+  *between(fromRevision, toRevision) {
+    let revisionNumber = fromRevision || 0;
+    let maxRevision = (toRevision || Infinity) < this.revisionNumber ? toRevision : this.revisionNumber;
+    while(revisionNumber <= maxRevision) {
+      let revision = this.revisions.get(revisionNumber++);
+      if(revision) {
+        yield [revision.key, this.get(revision.key)];
+      }
+    }
+  }
 }
 
 module.exports.Collection = Collection;
