@@ -3,10 +3,10 @@
 
 const assert = require('chai').assert,
       request = require('supertest'),
-      app = require('../fixture/app.fixture.js').App(),
-      CollectionJson = require('./collection-json.js').CollectionJson,
-      DeleteAny = require('./delete-any.js').DeleteAny,
-      Resource = require('../model.js').Resource;
+      app = require('../../fixture/app.fixture.js').App(),
+      CollectionJson = require('./json.js').CollectionJson,
+      DeleteAny = require('../delete-any.js').DeleteAny,
+      Resource = require('../../model.js').Resource;
 
 app.use(CollectionJson(), DeleteAny());
 

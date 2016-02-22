@@ -3,9 +3,9 @@
 const express = require('express'),
       zlib = require('zlib'),
       streamBuffers = require('stream-buffers'),
-      Resource = require('../model.js').Resource,
-      Collection = require('../model.js').Collection,
-      streamBodyBufferParser = require('./stream-body-buffer-parser.js').streamBodyBufferParser;
+      Resource = require('../../model.js').Resource,
+      Collection = require('../../model.js').Collection,
+      streamBodyBufferParser = require('../stream-body-buffer-parser.js').streamBodyBufferParser;
 
 function ResourceRaw() {
   let router = express.Router();

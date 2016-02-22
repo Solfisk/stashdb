@@ -3,8 +3,8 @@
 const express  = require('express'),
       zlib = require('zlib'),
       jsonBodyParser = require('body-parser').json(),
-      Resource = require('../model.js').Resource,
-      Collection = require('../model.js').Collection;
+      Resource = require('../../model.js').Resource,
+      Collection = require('../../model.js').Collection;
 
 function CollectionJson() {
   let router = express.Router();

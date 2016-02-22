@@ -5,8 +5,8 @@ const express  = require('express'),
       Model = require('./model.js').Model,
       Resource = require('./model.js').Resource,
       Collection = require('./model.js').Collection,
-      CollectionJson = require('./router/collection-json.js').CollectionJson,
-      ResourceRaw = require('./router/resource-raw.js').ResourceRaw,
+      CollectionJson = require('./router/collection/json.js').CollectionJson,
+      ResourceRaw = require('./router/resource/raw.js').ResourceRaw,
       DeleteAny = require('./router/delete-any.js').DeleteAny,
       model = new Model();
 

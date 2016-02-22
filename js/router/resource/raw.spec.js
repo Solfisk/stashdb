@@ -3,10 +3,9 @@
 
 const assert = require('chai').assert,
       request = require('supertest'),
-      app = require('../fixture/app.fixture.js').App(),
-      ResourceRaw = require('./resource-raw.js').ResourceRaw,
-      DeleteAny = require('./delete-any.js').DeleteAny,
-      series = require('async').series;
+      app = require('../../fixture/app.fixture.js').App(),
+      ResourceRaw = require('./raw.js').ResourceRaw,
+      DeleteAny = require('../delete-any.js').DeleteAny;
 
 app.use(ResourceRaw(), DeleteAny());
 
