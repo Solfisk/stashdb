@@ -1,5 +1,5 @@
 {
-  "name": "splitbrain",
+  "name": "stashdb",
   "version": "0.0.1",
   "description": "Topic based data repository",
   "main": "js/index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/mzedeler/splitbrain.git"
+    "url": "git+ssh://git@github.com/Solfisk/stashdb.git"
   },
   "author": "Michael Zedeler",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mzedeler/splitbrain/issues"
+    "url": "https://github.com/Solfisk/stashdb/issues"
   },
-  "homepage": "https://github.com/mzedeler/splitbrain#readme",
+  "homepage": "https://github.com/Solfisk/stashdb#readme",
   "devDependencies": {
     "chai": "^3.4.1",
     "mocha": "^2.3.4",
