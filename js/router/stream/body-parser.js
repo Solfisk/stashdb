@@ -30,5 +30,5 @@ function streamBodyParser(req, res, next) {
   next();
 }
 
-module.exports.streamBodyParser = streamBodyParser;
+module.exports = streamBodyParser;
 

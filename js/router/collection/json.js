@@ -1,12 +1,10 @@
 'use strict';
 
-const express  = require('express'),
-      zlib = require('zlib'),
+const zlib = require('zlib'),
       jsonBodyParser = require('body-parser').json(),
       Resource = require('../../model.js').Resource,
-      Collection = require('../../model.js').Collection;
-
-const router = express.Router();
+      Collection = require('../../model.js').Collection,
+      router = require('express').Router();
 
 router
   .route(/^.*\/(\?.*)*$/)

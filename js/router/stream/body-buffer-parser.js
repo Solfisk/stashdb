@@ -1,7 +1,7 @@
 'use strict';
-const express = require('express'),
-      streamBuffers = require('stream-buffers'),
-      streamBodyParser = require('./stream-body-parser.js').streamBodyParser;
+const streamBuffers = require('stream-buffers'),
+      streamBodyParser = require('./body-parser.js'),
+      router = require('express').Router();
 
 function streamBodyBufferParser(req, res, next) {
   let writable = new streamBuffers.WritableStreamBuffer({initialSize: 100});
@@ -16,8 +16,7 @@ function streamBodyBufferParser(req, res, next) {
   req.bodyStream.pipe(writable);
 }
 
-const router = express.Router();
 router.use(streamBodyParser, streamBodyBufferParser);
 
-module.exports.streamBodyBufferParser = router;
+module.exports = router;
 

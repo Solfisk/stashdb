@@ -3,8 +3,6 @@
 const express  = require('express'),
       getRawBody = require('raw-body'),
       Model = require('./model.js').Model,
-      ResourceRaw = require('./router/resource/raw.js').ResourceRaw,
-      DeleteAny = require('./router/delete-any.js').DeleteAny,
       model = new Model();
 
 // This route organization: http://codetunnel.io/an-intuitive-way-to-organize-your-expressjs-routes/
@@ -52,7 +50,11 @@ Subscribers to the meta collection about my_collection:
 function Server() {
   let app = express();
   app.locals.model = model;
-  app.use(require('./router/collection.js'));//, ResourceRaw(), DeleteAny());
+  app.use(
+    require('./router/collection.js'),
+    require('./router/resource/raw.js'),
+    require('./router/delete-any.js')
+  );
   app.get('*', function(req, res, next) {
     res.status(404).set('Content-Type', 'text/plain').send('Not found').end();
   });
