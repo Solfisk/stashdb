@@ -4,11 +4,11 @@
 const assert = require('chai').assert,
       request = require('supertest'),
       app = require('../../fixture/app.fixture.js').App(),
-      CollectionJson = require('./json.js').CollectionJson,
+      json = require('./json.js'),
       DeleteAny = require('../delete-any.js').DeleteAny,
       Resource = require('../../model.js').Resource;
 
-app.use(CollectionJson(), DeleteAny());
+app.use(json, DeleteAny());
 
 describe('Collection using Json', () => {
   it('Should handle GET / upon initialization', (done) => {

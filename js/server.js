@@ -3,9 +3,6 @@
 const express  = require('express'),
       getRawBody = require('raw-body'),
       Model = require('./model.js').Model,
-      Resource = require('./model.js').Resource,
-      Collection = require('./model.js').Collection,
-      CollectionJson = require('./router/collection/json.js').CollectionJson,
       ResourceRaw = require('./router/resource/raw.js').ResourceRaw,
       DeleteAny = require('./router/delete-any.js').DeleteAny,
       model = new Model();
@@ -55,7 +52,7 @@ Subscribers to the meta collection about my_collection:
 function Server() {
   let app = express();
   app.locals.model = model;
-  app.use(CollectionJson(), ResourceRaw(), DeleteAny());
+  app.use(require('./router/collection.js'));//, ResourceRaw(), DeleteAny());
   app.get('*', function(req, res, next) {
     res.status(404).set('Content-Type', 'text/plain').send('Not found').end();
   });
