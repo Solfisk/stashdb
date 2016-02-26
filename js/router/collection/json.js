@@ -1,52 +1,32 @@
 'use strict';
 
 const zlib = require('zlib'),
-      jsonBodyParser = require('body-parser').json(),
       Resource = require('../../model.js').Resource,
       Collection = require('../../model.js').Collection,
       router = require('express').Router();
 
 router
-  .route(/^.*\/(\?.*)*$/)
-  .get((req, res, next) => {
-    if((typeof req.query.list !== 'undefined') && req.accepts('json')) {
-      let node = req.app.locals.model.pointer(req.path).pop()[0];
-      if(!node) {
-        console.log(req.path + ' not found - next()');
-        next();
-        return;
+  .get('*', (req, res, next) => {
+    if(req.stashdb.node instanceof Collection && (typeof req.query.list !== 'undefined') && req.accepts('json')) {
+      req.stashdb.pager('list', Infinity);
+      const result = {};
+      for(let id in req.stashdb.result) {
+        result[id] = req.stashdb.path + id;
       }
-      if(node instanceof Collection) {
-        const pageSize = req.query.pageSize || Infinity,
-              page = req.query.page || 1,
-              fromRevision = req.query.fromRevision || 0,
-              toRevision = req.query.toRevision || node.revisionNumber;
-        let result = {},
-            i = 0;
-        for(let revisionPair of node.between(fromRevision, toRevision)) {
-          i++;
-          if(i > (pageSize * page || 0) || revisionPair[1].revisionNumber > toRevision) {
-            break;
-          } else if(i > (pageSize * (page - 1) || 0)) {
-            result[revisionPair[0]] = node.path + revisionPair[0];
-          }
-        }
-        if(pageSize < Infinity) {
-          res.header('Link', '<' + node.path + '?list&page=' + (page + 1) + '&pageSize=' + pageSize + '&fromRevision=' + fromRevision + '&toRevision=' + toRevision + '>; rel=next');
-        }
-        res.header('Collection-Revision', node.revisionNumber).json(result).end();
-      } else {
-        res.status(500).end();
-      }
+      res.json(result).end();
     } else {
-      console.log('CollectionJson - request doesnt accept json - next()');
       next();
       return;
     }
   })
-  .put(jsonBodyParser, (req, res, next) => {
-console.log('put: ' + req.path);
-    if(req.headers['content-type'] === 'application/json') {
+  .put('*', (req, res, next) => {
+      if(!req.stashdb.path.match(/\/$/) || !req.headers['content-type'] === 'application/json') {
+        next('route');
+      }
+    },
+    require('body-parser').json(),
+    (req, res, next) => {
+    if(req.stashdb.path.match(/\/$/) && req.headers['content-type'] === 'application/json') {
       if(typeof req.body === 'object' && !(req.body instanceof Array)) {
         let collection = new Collection();
         for(let name in req.body) {
@@ -55,7 +35,7 @@ console.log('put: ' + req.path);
           resource.content = zlib.gzipSync(new Buffer(JSON.stringify(req.body[name])));
           collection.set(name, resource);
         }
-        req.app.locals.model.set(req.path, collection);
+        req.app.locals.model.set(req.stashdb.path, collection);
         res.status(204).end();
       } else {
         res.status(400).end();

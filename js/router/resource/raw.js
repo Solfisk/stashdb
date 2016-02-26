@@ -2,35 +2,11 @@
 
 const Resource = require('../../model.js').Resource,
       Collection = require('../../model.js').Collection,
-      streamBodyBufferParser = require('../stream/body-buffer-parser.js'),
       router = require('express').Router();
 
 router.route(/^.*[^\/]$/)
-  .get((req, res, next) => {
-    let node = req.app.locals.model.pointer(req.url).pop()[0];
-    if(!node) {
-      console.log('ResourceRaw: ' + req.url + ' not found - next()');
-      next();
-      return;
-    }
-    if(node instanceof Resource) {
-      if(node.content) {
-        if(req.accepts(node.contentType) && req.acceptsCharsets(node.charset) && req.acceptsEncodings('gzip')) {
-          res.set({'Content-Type': node.contentType + (node.charset ? '; charset=' + node.charset : ''), 'Content-Encoding': 'gzip'}).send(node.content);
-        } else {
-          res.status(406).end();
-        }
-      } else {
-        res.status(204).end();
-      }
-    } else if(node === null || node === undefined) {
-      res.status(404).end();
-    } else {
-      console.warn('Node not instanceof Resource: ' + node);
-      res.status(500).end();
-    }
-  })
-  .put(streamBodyBufferParser, (req, res, next) => {
+  .get(require('../../middleware/renderer/resource.js'))
+  .put(require('../stream/body-buffer-parser.js'), (req, res, next) => {
     let resource = new Resource();
     resource.content = req.bodyBuffer;
     if(typeof req.headers['content-type'] === 'undefined') {

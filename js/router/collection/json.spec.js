@@ -4,11 +4,9 @@
 const assert = require('chai').assert,
       request = require('supertest'),
       app = require('../../fixture/app.fixture.js').App(),
-      json = require('./json.js'),
-      deleteAny = require('../delete-any.js'),
       Resource = require('../../model.js').Resource;
 
-app.use(json, deleteAny);
+app.use(require('../../middleware/node-lookup.js'), require('./pager.js'), require('./json.js'), require('../delete-any.js'));
 
 describe('Collection using Json', () => {
   it('Should handle GET / upon initialization', (done) => {
@@ -51,7 +49,7 @@ describe('Collection using Json', () => {
       it('Should have a revision header', (done) => {
         request(app)
           .get('/?list')
-          .expect('Collection-Revision', /^\d+$/)
+          .expect('Revision', /^\d+$/)
           .expect(200, done);
       });
       it('Should increase revision numbers when PUTting new resources', (done) => {
@@ -61,7 +59,7 @@ describe('Collection using Json', () => {
         app.locals.model.fixture.setPlain('/collection-history/b', 'b2');
         request(app)
           .get('/collection-history/?list')
-          .expect('Collection-Revision', 3)
+          .expect('Revision', 3)
           .expect(200, done);
       });
       it('Should return revisions since a given revision', (done) => {
