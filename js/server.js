@@ -9,6 +9,10 @@ const express  = require('express'),
 
 // http://martinfowler.com/articles/richardsonMaturityModel.html
 
+// http://binaryjs.com/
+
+// http://dataprotocols.org/ndjson/
+
 /*
 
   Resource: object to be PUT, GET or DELETE'd
