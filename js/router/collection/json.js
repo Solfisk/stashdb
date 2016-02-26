@@ -9,7 +9,7 @@ const zlib = require('zlib'),
 router
   .route(/^.*\/(\?.*)*$/)
   .get((req, res, next) => {
-    if(req.accepts('json')) {
+    if((typeof req.query.list !== 'undefined') && req.accepts('json')) {
       let node = req.app.locals.model.pointer(req.path).pop()[0];
       if(!node) {
         console.log(req.path + ' not found - next()');
@@ -32,7 +32,7 @@ router
           }
         }
         if(pageSize < Infinity) {
-          res.header('Link', '<' + node.path + '?page=' + (page + 1) + '&pageSize=' + pageSize + '&fromRevision=' + fromRevision + '&toRevision=' + toRevision + '>; rel=next');
+          res.header('Link', '<' + node.path + '?list&page=' + (page + 1) + '&pageSize=' + pageSize + '&fromRevision=' + fromRevision + '&toRevision=' + toRevision + '>; rel=next');
         }
         res.header('Collection-Revision', node.revisionNumber).json(result).end();
       } else {
@@ -45,6 +45,7 @@ router
     }
   })
   .put(jsonBodyParser, (req, res, next) => {
+console.log('put: ' + req.path);
     if(req.headers['content-type'] === 'application/json') {
       if(typeof req.body === 'object' && !(req.body instanceof Array)) {
         let collection = new Collection();
