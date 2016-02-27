@@ -7,7 +7,8 @@ module.exports = (req, res, next) => {
   if(node instanceof Resource) {
     if(node.content) {
       if(req.accepts(node.contentType) && req.acceptsCharsets(node.charset) && req.acceptsEncodings('gzip')) {
-        res.set({'Name': node.name, 'Link': '<' + node.path + '>; rel=canonical', 'Content-Type': node.contentType + (node.charset ? '; charset=' + node.charset : ''), 'Content-Encoding': 'gzip'}).send(node.content);
+        res.append('Link', '<' + node.path + '>; rel=' + (req.stashdb.path.match(/\/$/) ? 'resource' : 'canonical'));
+        res.set({'Resource-Revision': node.parent.key2revision.get(node.name), 'Name': node.name, 'Content-Type': node.contentType + (node.charset ? '; charset=' + node.charset : ''), 'Content-Encoding': 'gzip'}).send(node.content);
       } else {
         res.status(406).end();
       }

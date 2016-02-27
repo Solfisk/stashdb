@@ -55,7 +55,7 @@ function Server() {
   let app = express();
   app.locals.model = model;
   app.use(
-    require('./middleware/node-lookup.js'),
+    require('./middleware/init.js'),
     require('./router/collection.js'),
     require('./router/resource/raw.js'),
     require('./router/delete-any.js')

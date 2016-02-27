@@ -3,21 +3,31 @@
 const zlib = require('zlib'),
       Resource = require('../../model.js').Resource,
       Collection = require('../../model.js').Collection,
-      router = require('express').Router();
+      router = require('express').Router(),
+      pager = require('./pager.js');
 
 router
-  .get('*', (req, res, next) => {
-    if(req.stashdb.node instanceof Collection && (typeof req.query.list !== 'undefined') && req.accepts('json')) {
-      req.stashdb.pager('list', Infinity);
+  .get('*',
+    (req, res, next) => {
+      if(!(req.stashdb.node instanceof Collection) || (typeof req.query.list === 'undefined') || !req.accepts('json')) {
+        return next('route');
+      } else {
+        return next();
+      }
+    },
+    pager('list', Infinity),
+    (req, res, next) => {
       const result = {};
-      for(let id in req.stashdb.result) {
+      let pager = req.stashdb.result.pager;
+      for(let header of pager.headers) {
+        res.append.apply(res, header);
+      }
+      for(let id in pager.content) {
         result[id] = req.stashdb.path + id;
       }
       res.json(result).end();
-    } else {
-      return next();
     }
-  })
+  )
   .put('*', (req, res, next) => {
       if(!(req.stashdb.path.match(/\/$/)) || !req.headers['content-type'] === 'application/json') {
         return next('route');
