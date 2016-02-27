@@ -15,35 +15,29 @@ router
       }
       res.json(result).end();
     } else {
-      next();
-      return;
+      return next();
     }
   })
   .put('*', (req, res, next) => {
-      if(!req.stashdb.path.match(/\/$/) || !req.headers['content-type'] === 'application/json') {
-        next('route');
+      if(!(req.stashdb.path.match(/\/$/)) || !req.headers['content-type'] === 'application/json') {
+        return next('route');
       }
-      next();
+      return next();
     },
     require('body-parser').json(),
     (req, res, next) => {
-    if(req.stashdb.path.match(/\/$/) && req.headers['content-type'] === 'application/json') {
       if(typeof req.body === 'object' && !(req.body instanceof Array)) {
-        let collection = new Collection();
-        for(let name in req.body) {
-          let resource = new Resource();
-          resource.contentType = 'application/json; charset=utf-8';
-          resource.content = zlib.gzipSync(new Buffer(JSON.stringify(req.body[name])));
-          collection.set(name, resource);
-        }
-        req.app.locals.model.set(req.stashdb.path, collection);
-        res.status(204).end();
-      } else {
-        res.status(400).end();
+      let collection = new Collection();
+      for(let name in req.body) {
+        let resource = new Resource();
+        resource.contentType = 'application/json; charset=utf-8';
+        resource.content = zlib.gzipSync(new Buffer(JSON.stringify(req.body[name])));
+        collection.set(name, resource);
       }
+      req.app.locals.model.set(req.stashdb.path, collection);
+      res.status(204).end();
     } else {
-      next();
-      return;
+      res.status(400).end();
     }
   });
 
