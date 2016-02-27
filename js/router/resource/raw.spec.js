@@ -5,7 +5,7 @@ const assert = require('chai').assert,
       request = require('supertest'),
       app = require('../../fixture/app.fixture.js').App();
 
-app.use(require('../../middleware/node-lookup.js'), require('./raw.js'), require('../delete-any.js'));
+app.use(require('../../middleware/init.js'), require('./raw.js'), require('../delete-any.js'));
 
 describe('Resources', () => {
 

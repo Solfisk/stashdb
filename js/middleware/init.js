@@ -7,7 +7,8 @@ module.exports = (req, res, next) => {
   req.stashdb = {
     path: path,
     pointer: pointer,
-    node: node
+    node: node,
+    result: {}
   };
   next();
 };

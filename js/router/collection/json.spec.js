@@ -6,7 +6,7 @@ const assert = require('chai').assert,
       app = require('../../fixture/app.fixture.js').App(),
       Resource = require('../../model.js').Resource;
 
-app.use(require('../../middleware/node-lookup.js'), require('./pager.js'), require('./json.js'), require('../delete-any.js'));
+app.use(require('../../middleware/init.js'), require('./json.js'), require('../delete-any.js'));
 
 describe('Collection using Json', () => {
   it('Should handle GET / upon initialization', (done) => {
@@ -72,7 +72,7 @@ describe('Collection using Json', () => {
         request(app)
           .get('/collection-history/?list&fromRevision=a')
           .expect({})
-          .expect(200, done);
+          .expect(400, done);
       });
       it('Should return revisions up to given revision', (done) => {
         request(app)
