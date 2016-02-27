@@ -6,14 +6,12 @@ const Resource = require('../../model.js').Resource,
 
 router
   .get('*', (req, res, next) => {
-    if(req.stashdb.node instanceof Collection && (typeof req.query.get !== 'undefined')) {
+    if(!(req.stashdb.node instanceof Collection) || (typeof req.query.get === 'undefined')) {
+      return next('route');
+    } else {
       req.stashdb.pager('get', 1);
       req.stashdb.node = req.stashdb.result[Object.keys(req.stashdb.result)[0]][1];
-      console.log(req.stashdb.node);
-      next();
-    } else {
-      next('route');
-      return;
+      return next();
     }
   }, require('../../middleware/renderer/resource.js'));
 
