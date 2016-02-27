@@ -6,7 +6,6 @@ const Resource = require('../../model.js').Resource,
 
 router
   .get('*', (req, res, next) => {
-console.log('GET collection!');
     if(req.stashdb.node instanceof Collection && (typeof req.query.get !== 'undefined')) {
       req.stashdb.pager('get', 1);
       req.stashdb.node = req.stashdb.result[Object.keys(req.stashdb.result)[0]][1];

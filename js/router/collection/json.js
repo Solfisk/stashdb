@@ -23,6 +23,7 @@ router
       if(!req.stashdb.path.match(/\/$/) || !req.headers['content-type'] === 'application/json') {
         next('route');
       }
+      next();
     },
     require('body-parser').json(),
     (req, res, next) => {
