@@ -12,12 +12,12 @@ module.exports = (req, res, next) => {
     if(auth) {
       for(let token of auth) {
         useAuth = true;
-        authorized[token] = true;
+        authorized['Bearer ' + token] = true;
       }
     }
   }
   if(useAuth) {
-    if(!authorized['Bearer ' + req.headers.authorization]) {
+    if(!authorized[req.headers.authorization]) {
       res.status(401).send('Unauthorized.').end();
       return;
     }
