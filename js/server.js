@@ -1,7 +1,6 @@
 'use strict';
 
 const express  = require('express'),
-      getRawBody = require('raw-body'),
       Model = require('./model.js').Model,
       model = new Model();
 
@@ -51,11 +50,13 @@ Subscribers to the meta collection about my_collection:
 */
 
 
-function Server() {
+function Server(config) {
   let app = express();
   app.locals.model = model;
+  app.locals.config = config || {};
   app.use(
     require('./middleware/init.js'),
+    require('./middleware/auth.js'),
     require('./router/collection.js'),
     require('./router/resource/raw.js'),
     require('./router/delete-any.js')

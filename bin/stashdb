@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+
+'use strict';
+const Server = require('../js/server.js').Server,
+      config = require('rc')('stashdb', {});
+
+const server = new Server(config);
+server.listen(3000);
+
