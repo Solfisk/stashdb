@@ -6,11 +6,21 @@ module.exports = (req, res, next) => {
   const node = req.stashdb.node;
   if(node instanceof Resource) {
     if(node.content) {
-      if(req.accepts(node.contentType) && req.acceptsCharsets(node.charset) && req.acceptsEncodings('gzip')) {
+      let errors = [];
+      if(!req.accepts(node.contentType)) {
+        errors.push('Unacceptable content type: ' + node.contentType);
+      }
+      if(!req.acceptsCharsets(node.charset)) {
+        errors.push('Unacceptable charset: ' + node.charset);
+      }
+      if(!req.acceptsEncodings('gzip')) {
+        errors.push('Unacceptable encoding: gzip');
+      }
+      if(!errors.length) {
         res.append('Link', '<' + node.path + '>; rel=' + (req.stashdb.path.match(/\/$/) ? 'resource' : 'canonical'));
         res.set({'Resource-Revision': node.parent.key2revision.get(node.name), 'Name': node.name, 'Content-Type': node.contentType + (node.charset ? '; charset=' + node.charset : ''), 'Content-Encoding': 'gzip'}).send(node.content);
       } else {
-        res.status(406).end();
+        res.status(406).send(errors.join(', ') + '.').end();
       }
     } else {
       res.status(204).end();
