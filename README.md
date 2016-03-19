@@ -16,7 +16,7 @@ If you `PUT /some/resource`, stashdb will store the resouce you have provided an
 
 ### /some/collection/
 
-If you `PUT /some/collection/resource`, the collection /some/collection is created automatically for you (and all intermediary collection).
+If you `PUT /some/collection/resource`, the collection /some/collection is created automatically for you (and all intermediary collections).
 
 After this, you can iterate on all resources in the collection like this:
 
