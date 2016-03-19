@@ -39,18 +39,18 @@ describe('Basic methods', () => {
   });
   it('Has correct revision entries', () => {
     assert.equal(collection.revisionNumber, 2);
-    assert.deepEqual([...collection.between(0)], [['a', x], ['b', y]]);
+    assert.deepEqual([...collection.between(0)], [['a', x, 1], ['b', y, 2]]);
     assert.deepEqual([...collection.between(3)], []);
   });
   it('Supports delete', () => {
     collection.delete('a');
     assert.deepEqual([...collection], [['b', y]], 'Collection contains b => y');
-    assert.deepEqual([...collection.between(0)], [['b', y], ['a', undefined]], 'History contains tombstone for a');
+    assert.deepEqual([...collection.between(0)], [['b', y, 2], ['a', undefined, 3]], 'History contains tombstone for a');
   });
   it('Supports reinsertion of elements', () => {
     collection.set('a', x2);
     assert.deepEqual([...collection], [['b', y], ['a', x2]], 'Collection contains b => y and a => x2');
-    assert.deepEqual([...collection.between(0)], [['b', y], ['a', x2]], 'History contains b => y and a => x2');
+    assert.deepEqual([...collection.between(0)], [['b', y, 2], ['a', x2, 4]], 'History contains b => y and a => x2');
   });
   it('Has working between method', () => {
     assert.deepEqual([...collection.between(0, 0)], [], 'History from 0 to 0 is empty');
@@ -59,7 +59,7 @@ describe('Basic methods', () => {
   it('Supports clear()', () => {
     collection.clear();
     assert.deepEqual([...collection], [], 'Collection is empty');
-    assert.deepEqual([...collection.between(0)], [['b', undefined], ['a', undefined]], 'History contains tombstones for a and b');
+    assert.deepEqual([...collection.between(0)], [['b', undefined, 5], ['a', undefined, 6]], 'History contains tombstones for a and b');
   });
 });
 

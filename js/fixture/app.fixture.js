@@ -29,6 +29,9 @@ function App() {
     },
     newCollection: (key) => {
       model.set(key, new Collection());
+    },
+    delete: (key) => {
+      model.get(key).detach();
     }
   };
 

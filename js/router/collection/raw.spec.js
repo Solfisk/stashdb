@@ -25,21 +25,41 @@ describe('Collection using raw', () => {
   });
 
   describe('Paging', () => {
-    it('Should ignore the pageSize parameter', (done) => {
-      app.locals.model.fixture.newCollection('/paging/');
-      for(let i=1; i<4; i++) {
-        app.locals.model.fixture.setPlain('/paging/' + i, i);
-      }
-      request(app)
-        .get('/paging/?get&pageSize=2')
-        .expect(400, done);
-    });
-    it('Should handle out of bounds revision page parameters', (done) => {
-      request(app)
-        .get('/paging/?get&page=-1&fromRevision=0&toRevision=3')
-        .expect(400, done);
-    });
+    app.locals.model.fixture.newCollection('/paging/');
+    for(let i=1; i<4; i++) {
+      app.locals.model.fixture.setPlain('/paging/' + i, i);
+    }
     it('Should be possible to page through the collection', (done) => {
+        const test = (link, run) => {
+          request(app)
+            .get(link)
+            .expect(200)
+            .expect('content: ' + run)
+            .end((err, res) => {
+              if(err) {
+                return done(err);
+              } else {
+                const next = parseLinkHeader(res.headers.link).next;
+                if(next) {
+                  if(run == 3) {
+                    // Finished
+                    request(app)
+                      .get(next.url)
+                      .expect(204, done);
+                  } else {
+                    // Keep testing
+                    test(next.url, ++run);
+                  }
+                } else {
+                  done('No next link! This must be in every response from raw resource handler.');
+                }
+              }
+          });
+        };
+        test('/paging/?get', 1);
+    });
+
+    it('Should be possible to pick up new items that were added after paging started', (done) => {
       const test = (link, run) => {
         request(app)
           .get(link)
@@ -51,8 +71,84 @@ describe('Collection using raw', () => {
             } else {
               const next = parseLinkHeader(res.headers.link).next;
               if(next) {
+                if(run === 1) {
+                  app.locals.model.fixture.setPlain('/paging/4', 4);
+                }
+                if(run == 4) {
+                  // Finished
+                  request(app)
+                    .get(next.url)
+                    .expect(204, done);
+                } else {
+                  // Keep testing
+                  test(next.url, ++run);
+                }
+              } else {
+                done('No next link! This must be in every response from raw resource handler.');
+              }
+            }
+        });
+      };
+      test('/paging/?get', 1);
+    });
+
+    it('Should be possible to get 204 for deleted items when paging with get', (done) => {
+      const test = (link, run) => {
+        request(app)
+          .get(link)
+          .expect(200)
+          .expect('content: ' + run)
+          .end((err, res) => {
+            if(err) {
+              return done(err);
+            } else {
+              const links = parseLinkHeader(res.headers.link),
+                    next = links.next;
+              if(next) {
+                if(run === 1) {
+                  assert.isDefined(links.resource);
+                  app.locals.model.fixture.delete(links.resource.url);
+                }
+                if(run == 4) {
+                  // Finished
+                  request(app)
+                    .get(next.url)
+                    .expect('Name', '1')
+                    .expect(204, done);
+                } else {
+                  // Keep testing
+                  test(next.url, ++run);
+                }
+              } else {
+                done('No next link! This must be in every response from raw resource handler.');
+              }
+            }
+        });
+      };
+      test('/paging/?get', 1);
+    });
+    /*
+    it('Should be possible to get 204 for deleted items when paging with get', (done) => {
+      const test = (link, run) => {
+        request(app)
+          .get(link)
+          .expect(200)
+          .expect('content: ' + run)
+          .end((err, res) => {
+            console.log(res.headers);
+            if(err) {
+              return done(err);
+            } else {
+              const next = parseLinkHeader(res.headers.link).next;
+              if(next) {
+                if(run === 4) {
+                  console.log('DELETE');
+                  const paging = app.locals.model.get('/paging/');
+                  app.locals.model.fixture.delete('/paging/4');
+                }
                 test(next.url, ++run);
               } else {
+                assert.equal(run, 4);
                 done();
               }
             }
@@ -60,6 +156,7 @@ describe('Collection using raw', () => {
       };
       test('/paging/?get&pageSize=1', 1);
     });
+    */
   });
 });
 

@@ -61,10 +61,11 @@ class Collection extends Node {
     let revisionNumber = fromRevision || 0,
         maxRevision = toRevision < this.revisionNumber ? toRevision : this.revisionNumber;
     while(revisionNumber <= maxRevision) {
-      let revision = this.revisions.get(revisionNumber++);
+      let revision = this.revisions.get(revisionNumber);
       if(revision) {
-        yield [revision.key, this.get(revision.key)];
+        yield [revision.key, this.get(revision.key), revisionNumber];
       }
+      revisionNumber++;
     }
   }
 }
