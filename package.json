@@ -5,6 +5,7 @@
   "main": "js/index.js",
   "scripts": {
     "test": "node node_modules/mocha/bin/mocha --ui tdd --recursive js",
+    "tdd": "nodemon node_modules/mocha/bin/mocha --ui tdd --recursive js",
     "start": "node bin/stashdb"
   },
   "repository": {
@@ -20,6 +21,7 @@
   "devDependencies": {
     "chai": "^3.4.1",
     "mocha": "^2.3.4",
+    "nodemon": "^1.9.2",
     "supertest": "^1.1.0"
   },
   "dependencies": {
