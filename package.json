@@ -1,6 +1,6 @@
 {
   "name": "stashdb",
-  "version": "0.4.3",
+  "version": "0.7.0",
   "description": "Topic based data repository",
   "main": "js/index.js",
   "scripts": {

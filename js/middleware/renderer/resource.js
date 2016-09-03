@@ -1,11 +1,12 @@
 'use strict';
 
 const Resource = require('../../model.js').Resource;
+const createReadStream = require('fs').createReadStream;
 
 module.exports = (req, res, next) => {
   const node = req.stashdb.node;
   if(node instanceof Resource) {
-    if(node.content) {
+    if(node.contentFile || node.content) {
       let errors = [];
       if(!req.accepts(node.contentType)) {
         errors.push('Unacceptable content type: ' + node.contentType);
@@ -18,7 +19,15 @@ module.exports = (req, res, next) => {
       }
       if(!errors.length) {
         res.append('Link', '<' + node.path + '>; rel=' + (req.stashdb.path.match(/\/$/) ? 'resource' : 'canonical'));
-        res.set({'Resource-Revision': node.parent.key2revision.get(node.name), 'Name': node.name, 'Content-Type': node.contentType + (node.charset ? '; charset=' + node.charset : ''), 'Content-Encoding': 'gzip'}).send(node.content);
+        res.set({'Resource-Revision': node.parent.key2revision.get(node.name), 'Name': node.name, 'Content-Type': node.contentType + (node.charset ? '; charset=' + node.charset : ''), 'Content-Encoding': 'gzip'});
+        if(node.contentFile) {
+          const stream = createReadStream(node.contentFile);
+          stream.on('readable', () => {
+            stream.pipe(res);
+          });
+        } else {
+          res.send(node.content);
+        }
       } else {
         res.status(406).send(errors.join(', ') + '.').end();
       }

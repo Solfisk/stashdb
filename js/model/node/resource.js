@@ -17,4 +17,3 @@ class Resource extends Node {
 Node.Collection = () => { return Collection; };
 
 module.exports.Resource = Resource;
-

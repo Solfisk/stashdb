@@ -127,7 +127,18 @@ describe('Resources', () => {
       it('Should be able to DELETE resource: ' + path, remove(path));
       it('Should not be able to GET: ' + path, gone(path));
     }
+
+    describe('File storage', () => {
+      app.locals.config = { resourceDir: require('os').tmpdir() };
+
+      for(let path of ['/_a', '/_x/y']) {
+        it('Should be able to create resource: ' + path, save(path, 1));
+        it('Should be able to GET newly created resource: ' + path, exists(path, 1));
+        it('Should be able to replace resource: ' + path, save(path, 2));
+        it('Should be able to GET replaced resource: ' + path, exists(path, 2));
+        it('Should be able to DELETE resource: ' + path, remove(path));
+        it('Should not be able to GET: ' + path, gone(path));
+      }
+    });
   });
-
 });
-

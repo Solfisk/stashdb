@@ -6,4 +6,3 @@ const Server = require('../js/server.js').Server,
 
 const server = new Server(config);
 server.listen(3000);
-
