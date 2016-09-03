@@ -1,12 +1,12 @@
 {
   "name": "stashdb",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Topic based data repository",
   "main": "js/index.js",
   "scripts": {
     "test": "node node_modules/mocha/bin/mocha --ui tdd --recursive js",
     "tdd": "nodemon node_modules/mocha/bin/mocha --ui tdd --recursive js",
-    "start": "node bin/stashdb"
+    "start": "node bin/stashdb --resourceDir=./.resources"
   },
   "repository": {
     "type": "git",
