@@ -20,7 +20,15 @@ router.route(/^.*[^\/]$/)
       resource.content = req.bodyBuffer;
       cb();
     };
-    const store = req.app.locals.config && req.app.locals.config.resourceDir ? storeDisk : storeRam;
+    const storeDb = cb => {
+      const store = req.app.locals.store;
+      const txn = store.begin();
+      store.set(txn, 'resource', req.path, req.bodyBuffer);
+      txn.commit();
+      cb();
+    };
+    // const store = req.app.locals.config && req.app.locals.config.resourceDir ? storeDisk : storeRam;
+    const store = storeDb;
 
     store(err => {
       if(err) {

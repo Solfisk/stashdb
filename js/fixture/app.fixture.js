@@ -1,14 +1,16 @@
 'use strict';
 
-const express = require('express'),
-      zlib = require('zlib'),
-      Model = require('../model.js').Model,
-      Resource = require('../model.js').Resource,
-      Collection = require('../model.js').Collection;
+const express = require('express');
+const zlib = require('zlib');
+const Model = require('../model.js').Model;
+const Resource = require('../model.js').Resource;
+const Collection = require('../model.js').Collection;
+const Store = require('../store');
 
 function App() {
-  let model = new Model(),
-      app = express();
+  const model = new Model();
+  const app = express();
+  const store = new Store('/tmp/', 1024 * 1024);
 
   function resource(contentType, charset, contentString) {
     let resource = new Resource();
@@ -40,6 +42,7 @@ function App() {
   model.fixture.newCollection('/a/b/c/');
 
   app.locals.model = model;
+  app.locals.store = store;
 
   return app;
 }

@@ -6,7 +6,12 @@ const createReadStream = require('fs').createReadStream;
 module.exports = (req, res, next) => {
   const node = req.stashdb.node;
   if(node instanceof Resource) {
-    if(node.contentFile || node.content) {
+    const store = req.app.locals.store;
+    const txn = store.begin();
+    const storeContent = store.get(txn, 'resource', node.path);
+    txn.commit();
+
+    if(node.contentFile || node.content || storeContent) {
       let errors = [];
       if(!req.accepts(node.contentType)) {
         errors.push('Unacceptable content type: ' + node.contentType);
@@ -25,8 +30,10 @@ module.exports = (req, res, next) => {
           stream.on('readable', () => {
             stream.pipe(res);
           });
-        } else {
+        } else if(node.content) {
           res.send(node.content);
+        } else {
+          res.send(storeContent);
         }
       } else {
         res.status(406).send(errors.join(', ') + '.').end();

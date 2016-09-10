@@ -28,6 +28,7 @@
     "body-parser": "^1.15.0",
     "express": "^4.13.3",
     "joi": "^8.0.3",
+    "node-lmdb": "^0.4.1",
     "parse-link-header": "^0.4.1",
     "rc": "^1.1.6",
     "stream-buffers": "^3.0.0"

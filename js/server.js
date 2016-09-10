@@ -1,8 +1,8 @@
 'use strict';
 
-const express  = require('express'),
-      Model = require('./model.js').Model,
-      model = new Model();
+const express  = require('express');
+const Model = require('./model').Model;
+const Store = require('./store');
 
 // This route organization: http://codetunnel.io/an-intuitive-way-to-organize-your-expressjs-routes/
 
@@ -51,8 +51,9 @@ Subscribers to the meta collection about my_collection:
 
 
 function Server(config) {
-  let app = express();
-  app.locals.model = model;
+  const app = express();
+  app.locals.model = new Model();
+  app.locals.store = new Store(config ? config.path : '/tmp/', config ? config.dbSize : 1024 * 1024);
   app.locals.config = config || {};
   app.use(
     require('./middleware/init.js'),
