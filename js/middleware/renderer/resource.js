@@ -9,6 +9,7 @@ module.exports = (req, res, next) => {
     const store = req.app.locals.store;
     const txn = store.begin();
     const storeContent = store.get(txn, 'resource', node.path);
+    const storedNode = store.getMeta(txn, node.path);
     txn.commit();
 
     if(node.contentFile || node.content || storeContent) {

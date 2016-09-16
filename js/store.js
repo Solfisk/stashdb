@@ -50,7 +50,7 @@ class Store {
   }
   
   setMeta(txn, path, meta) {
-    this.set(txn, 'meta', JSON.stringify(meta));
+    this.set(txn, 'meta', path, new Buffer(JSON.stringify(meta)));
   }
   
   delete(txn, path) {
