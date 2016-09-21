@@ -25,9 +25,12 @@
     "supertest": "^1.1.0"
   },
   "dependencies": {
+    "bl": "^1.1.2",
     "body-parser": "^1.15.0",
+    "compression": "^1.6.2",
     "express": "^4.13.3",
     "joi": "^8.0.3",
+    "mz": "^2.4.0",
     "node-lmdb": "^0.4.1",
     "parse-link-header": "^0.4.1",
     "rc": "^1.1.6",

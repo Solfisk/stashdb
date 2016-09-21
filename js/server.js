@@ -49,6 +49,7 @@ Subscribers to the meta collection about my_collection:
 
 */
 
+// Use compression for compression responses
 
 function Server(config) {
   const app = express();

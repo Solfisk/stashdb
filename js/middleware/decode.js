@@ -38,7 +38,7 @@ function decode(req, res, next) {
         gzip,
         identity,
     };
-    next();
+    next('route');
   } else {
     console.warn('Unsupported');
     res.status(415).end('Unsupported content encoding "' + encoding + '"');
